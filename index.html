@@ -64,6 +64,19 @@ mark{background:var(--mark);padding:0 1px}
 .pager button{padding:7px 14px;border:1.5px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink-soft)}
 .pager button:disabled{opacity:.35;cursor:default}
 .pager button:not(:disabled):hover{border-color:var(--accent)}
+.listbtn{font-family:Verdana,Arial,sans-serif;font-size:.8rem;padding:7px 14px;border:1.5px solid var(--accent);border-radius:6px;background:var(--panel);color:var(--accent-ink)}
+.listbtn:hover{background:var(--accent);color:#fff}
+.listbtn:disabled{opacity:.4;cursor:default;background:var(--panel);color:var(--accent-ink)}
+.ltools{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 18px}
+.ltools button{font-family:Verdana,Arial,sans-serif;font-size:.8rem;padding:7px 14px;border:1.5px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink-soft)}
+.ltools button:hover{border-color:var(--accent);color:var(--accent-ink)}
+.ltools .lprimary{background:var(--accent);border-color:var(--accent);color:#fff}
+.ltools .lprimary:hover{color:#fff;opacity:.9}
+.lnote{font-family:Verdana,Arial,sans-serif;font-size:.78rem;color:var(--ink-faint)}
+.lfilters{font-family:Verdana,Arial,sans-serif;font-size:.8rem;color:var(--ink-soft);margin-top:4px}
+#lbody ol{padding-left:1.6em}
+#lbody li{margin-bottom:.45em;line-height:1.4}
+#lbody .lmeta{color:var(--ink-faint);font-size:.88rem}
 .empty{text-align:center;color:var(--ink-faint);padding:60px 20px;font-style:italic}
 
 .overlay{position:fixed;inset:0;z-index:100;background:rgba(38,34,28,.5);display:none;overflow-y:auto;padding:24px 12px}
@@ -124,7 +137,7 @@ footer{border-top:1px solid var(--line);padding:20px;text-align:center;font-fami
   </div>
 </div>
 
-<div class="resultbar"><div id="count"></div></div>
+<div class="resultbar"><div id="count"></div><button class="listbtn" id="makelist" title="List every article matching the current search and filters, with a link to each">Make a list of these articles</button></div>
 <main>
   <div id="loading">Loading the catalog…</div>
   <div id="loaderr">Could not load the data files. Make sure <b>JAK_Writings_Data.js</b> and <b>JAK_New_Writings.js</b> are in the same folder as this catalog file.</div>
@@ -136,6 +149,21 @@ footer{border-top:1px solid var(--line);padding:20px;text-align:center;font-fami
   <div class="rpanel">
     <button class="rclose" id="rclose" title="Close (Esc)">&times;</button>
     <div id="rcontent"></div>
+  </div>
+</div>
+
+<div id="lister" class="overlay" role="dialog" aria-modal="true" aria-labelledby="ltitle">
+  <div class="rpanel">
+    <button class="rclose" id="lclose" title="Close (Esc)">&times;</button>
+    <div class="rtitle" id="ltitle">Reading list</div>
+    <div class="lfilters" id="lfilters"></div>
+    <div class="ltools">
+      <button class="lprimary" id="lcopy">Copy list with links</button>
+      <button id="lcopymd">Copy as Markdown</button>
+      <button id="ldl">Download as web page</button>
+      <span class="lnote" id="lmsg" aria-live="polite"></span>
+    </div>
+    <div id="lbody"></div>
   </div>
 </div>
 
@@ -280,6 +308,8 @@ function run(){
 
   const anyFilter = st.q || st.src.size || st.yr.size || st.tags.size;
   $('clearall').style.display = anyFilter ? '' : 'none';
+  $('makelist').disabled = !view.length;
+  $('makelist').textContent = 'Make a list of ' + (anyFilter ? 'these ' + view.length.toLocaleString() : 'all') + ' article' + (view.length===1?'':'s');
   $('count').textContent = view.length.toLocaleString() + (anyFilter ? ' of '+P.length.toLocaleString() : '') + ' articles';
   renderPage(terms);
 }
@@ -372,6 +402,92 @@ function closeReader(){ $('reader').classList.remove('open'); document.body.styl
 $('rclose').onclick = closeReader;
 $('reader').addEventListener('click', e => { if(e.target === $('reader')) closeReader(); });
 document.addEventListener('keydown', e => { if(e.key === 'Escape') closeReader(); });
+
+// reading list of the articles currently shown
+function filterSummary(){
+  const parts = [];
+  if(st.q) parts.push('Search: “'+st.q+'”');
+  if(st.src.size) parts.push('Blogs: '+[...st.src].map(id=>SRC[id].name).join(', '));
+  if(st.yr.size) parts.push('Years: '+[...st.yr].sort().join(', '));
+  if(st.tags.size) parts.push('Tags: '+[...st.tags].map(t=>TAGS[t]).join(', '));
+  return parts.length ? parts.join(' · ') : 'All articles, no filters';
+}
+function listItems(){ return view.map(i => P[i]); }
+function listHTML(){
+  return '<ol>' + listItems().map(p =>
+    `<li>${p.u ? `<a href="${esc(p.u)}" target="_blank" rel="noopener">${esc(p.t)}</a>` : esc(p.t)}`+
+    ` <span class="lmeta">— ${esc(SRC[p.s]?SRC[p.s].name:'')}, ${fmtDate(p.d)}</span></li>`).join('') + '</ol>';
+}
+function listMarkdown(){
+  const mdEsc = s => s.replace(/([\[\]])/g,'\\$1');
+  return listItems().map((p,n) => `${n+1}. ${p.u ? `[${mdEsc(p.t)}](${p.u})` : p.t} — ${SRC[p.s]?SRC[p.s].name:''}, ${fmtDate(p.d)}`).join('\n');
+}
+function listPlain(){
+  return listItems().map((p,n) => `${n+1}. ${p.t} — ${SRC[p.s]?SRC[p.s].name:''}, ${fmtDate(p.d)}\n   ${p.u}`).join('\n');
+}
+function flash(msg){ $('lmsg').textContent = msg; clearTimeout(flash.t); flash.t = setTimeout(()=>$('lmsg').textContent='', 3500); }
+function openLister(){
+  if(!view.length) return;
+  $('ltitle').textContent = 'Reading list — ' + view.length.toLocaleString() + ' article' + (view.length===1?'':'s');
+  $('lfilters').textContent = filterSummary();
+  $('lbody').innerHTML = listHTML();
+  $('lmsg').textContent = '';
+  $('lister').classList.add('open'); $('lister').scrollTop = 0;
+  document.body.style.overflow = 'hidden';
+}
+function closeLister(){ $('lister').classList.remove('open'); document.body.style.overflow=''; }
+$('makelist').onclick = openLister;
+$('lclose').onclick = closeLister;
+$('lister').addEventListener('click', e => { if(e.target === $('lister')) closeLister(); });
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeLister(); });
+
+async function copyRich(html, text){
+  try{
+    if(navigator.clipboard && window.ClipboardItem){
+      await navigator.clipboard.write([new ClipboardItem({
+        'text/html': new Blob([html], {type:'text/html'}),
+        'text/plain': new Blob([text], {type:'text/plain'})})]);
+      return true;
+    }
+  }catch(e){}
+  // fallback: copy the rendered list by selection
+  try{
+    const sel = window.getSelection(), r = document.createRange();
+    r.selectNodeContents($('lbody')); sel.removeAllRanges(); sel.addRange(r);
+    const ok = document.execCommand('copy'); sel.removeAllRanges(); return ok;
+  }catch(e){ return false; }
+}
+async function copyText(text){
+  try{ await navigator.clipboard.writeText(text); return true; }
+  catch(e){
+    const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta);
+    ta.select(); let ok=false; try{ ok = document.execCommand('copy'); }catch(_){} ta.remove(); return ok;
+  }
+}
+$('lcopy').onclick = async () => {
+  const head = `<p><b>${esc($('ltitle').textContent)}</b><br>${esc(filterSummary())}</p>`;
+  const ok = await copyRich(head + listHTML(), $('ltitle').textContent+'\n'+filterSummary()+'\n\n'+listPlain());
+  flash(ok ? 'Copied — paste into an email, document or blog post and the links come with it.' : 'Copy was blocked by the browser. Select the list and copy it by hand.');
+};
+$('lcopymd').onclick = async () => {
+  const ok = await copyText('**'+$('ltitle').textContent+'**\n\n'+filterSummary()+'\n\n'+listMarkdown()+'\n');
+  flash(ok ? 'Markdown copied.' : 'Copy was blocked by the browser.');
+};
+$('ldl').onclick = () => {
+  const title = $('ltitle').textContent;
+  const page = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${esc(title)}</title>
+<style>body{font-family:Georgia,serif;max-width:760px;margin:40px auto;padding:0 20px;line-height:1.55;color:#26221c;background:#faf8f4}
+h1{font-weight:normal;font-size:1.6rem}p.f{color:#5c554a;font-family:Verdana,Arial,sans-serif;font-size:.85rem}
+li{margin-bottom:.45em}a{color:#2c4433}.lmeta{color:#8a8274;font-size:.9rem}</style></head><body>
+<h1>${esc(title)}</h1><p class="f">${esc(filterSummary())}<br>From <a href="https://kislingjeff-oss.github.io/JAKPublicBlogDatabase/">Jeff Kisling — Complete Writings</a></p>
+${listHTML()}</body></html>`;
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([page], {type:'text/html'}));
+  a.download = 'Jeff-Kisling-reading-list.html';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+  flash('Downloaded.');
+};
 
 // stats
 const dmin = P[P.length-1].d, dmax = P[0].d;
