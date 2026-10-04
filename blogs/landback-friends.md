@@ -25,7 +25,9 @@ Blog by Jeff Kisling at <https://landbackfriends.com>.[^blog]
 
 | | |
 |---|---|
-| Posts in the catalog | 229 |
+| Posts published | 229 |
+| Shown in the catalog | 227 |
+| Left out as copies of a newer post on another blog | 2 |
 | First post | 2021-06-14 |
 | Most recent post | 2024-07-04 |
 

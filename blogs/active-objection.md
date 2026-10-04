@@ -25,7 +25,9 @@ Blog by Jeff Kisling at <https://activeobjection.substack.com>.[^blog]
 
 | | |
 |---|---|
-| Posts in the catalog | 65 |
+| Posts published | 65 |
+| Shown in the catalog | 47 |
+| Left out as copies of a newer post on another blog | 18 |
 | First post | 2026-04-07 |
 | Most recent post | 2026-07-16 |
 

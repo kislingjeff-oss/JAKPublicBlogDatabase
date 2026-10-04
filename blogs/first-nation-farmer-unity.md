@@ -25,7 +25,9 @@ Blog by Jeff Kisling at <https://firstnationfarmer.com>.[^blog]
 
 | | |
 |---|---|
-| Posts in the catalog | 55 |
+| Posts published | 55 |
+| Shown in the catalog | 54 |
+| Left out as copies of a newer post on another blog | 1 |
 | First post | 2020-04-01 |
 | Most recent post | 2020-06-02 |
 

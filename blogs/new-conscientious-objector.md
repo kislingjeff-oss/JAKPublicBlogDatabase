@@ -25,7 +25,9 @@ Blog by Jeff Kisling at <https://newconscientiousobjector.com>.[^blog]
 
 | | |
 |---|---|
-| Posts in the catalog | 255 |
+| Posts published | 255 |
+| Shown in the catalog | 254 |
+| Left out as copies of a newer post on another blog | 1 |
 | First post | 2025-01-29 |
 | Most recent post | 2026-03-16 |
 

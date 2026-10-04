@@ -25,7 +25,9 @@ Blog by Jeff Kisling at <https://jeffkisling.com>.[^blog]
 
 | | |
 |---|---|
-| Posts in the catalog | 1,969 |
+| Posts published | 1,969 |
+| Shown in the catalog | 1,940 |
+| Left out as copies of a newer post on another blog | 29 |
 | First post | 2015-01-04 |
 | Most recent post | 2022-01-19 |
 

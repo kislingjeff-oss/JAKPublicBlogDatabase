@@ -89,6 +89,8 @@ mark{background:var(--mark);padding:0 1px}
 .rtitle{font-size:1.6rem;line-height:1.25;margin-bottom:4px}
 .rsub{color:var(--ink-soft);font-style:italic;margin-bottom:10px}
 .rlink{font-family:Verdana,Arial,sans-serif;font-size:.8rem;margin-bottom:20px}
+.ralso{font-family:Verdana,Arial,sans-serif;font-size:.78rem;color:var(--ink-faint);margin:-12px 0 20px}
+.ralso a{margin-right:10px}
 .rbody{font-size:1.06rem;line-height:1.7}
 .rbody p{margin-bottom:1em}
 .rtags{margin-top:26px;padding-top:16px;border-top:1px solid var(--line);display:flex;gap:6px;flex-wrap:wrap}
@@ -184,8 +186,14 @@ BASE.sources.forEach(s => SRC[s.id] = {name: SHORT[s.id]||s.name, url: s.url});
 ADD.sites.forEach(s => SRC[s.id] = {name: s.name, url: s.url});
 TAGS = BASE.tags.slice();
 TAGS.forEach((t,i) => tagLookup[t.toLowerCase()] = i);
-const posts = BASE.posts.map(p => p);
+// Copies of the same article on more than one blog: keep the most recent
+// (chosen by scripts/update_channels.py), and remember where the others live.
+const HIDE = new Set(ADD.hide || []);
+const ALSO = ADD.also || {};
+const decode = s => (s && s.indexOf('&') >= 0) ? s.replace(/&#(\d+);/g,(_,n)=>String.fromCodePoint(+n)).replace(/&#x([0-9a-f]+);/gi,(_,n)=>String.fromCodePoint(parseInt(n,16))).replace(/&quot;/g,'"').replace(/&#039;|&apos;/g,"'").replace(/&nbsp;/g,' ').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&') : s;
+const posts = BASE.posts.filter(p => !HIDE.has(p.u)).map(p => ({...p, t:decode(p.t), b:decode(p.b), x:decode(p.x)}));
 ADD.posts.forEach(p => {
+  if(HIDE.has(p.u)) return;
   const g = [];
   (p.tags||[]).forEach(name => {
     const k = name.toLowerCase();
@@ -385,6 +393,7 @@ function renderReader(i){
     <div class="rtitle">${esc(p.t)}</div>
     ${p.b ? `<div class="rsub">${esc(p.b)}</div>` : ''}
     ${p.u ? `<div class="rlink"><a href="${esc(p.u)}" target="_blank" rel="noopener">Read at the original site &nearr;</a></div>` : ''}
+    ${ALSO[p.u] ? `<div class="ralso">Also published at: ${ALSO[p.u].map(([s,d,u]) => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(SRC[s]?SRC[s].name:'')}, ${fmtDate(d)}</a>`).join('')}</div>` : ''}
     <div class="rbody">${paras || '<p><i>No text captured for this post — use the link above.</i></p>'}</div>
     ${tags ? `<div class="rtags">${tags}</div>` : ''}
     <div class="rnav">

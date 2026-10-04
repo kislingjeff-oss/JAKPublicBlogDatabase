@@ -25,7 +25,9 @@ Blog by Jeff Kisling at <https://unflinching.blog>.[^blog]
 
 | | |
 |---|---|
-| Posts in the catalog | 413 |
+| Posts published | 413 |
+| Shown in the catalog | 277 |
+| Left out as copies of a newer post on another blog | 136 |
 | First post | 2024-02-02 |
 | Most recent post | 2025-07-10 |
 

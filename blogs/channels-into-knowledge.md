@@ -25,7 +25,9 @@ Blog by Jeff Kisling at <https://channelsintoknowledge.com>.[^blog]
 
 | | |
 |---|---|
-| Posts in the catalog | 53 |
+| Posts published | 53 |
+| Shown in the catalog | 53 |
+| Left out as copies of a newer post on another blog | 0 |
 | First post | 2026-08-07 |
 | Most recent post | 2026-10-03 |
 

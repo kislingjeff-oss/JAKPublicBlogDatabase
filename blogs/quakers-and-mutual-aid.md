@@ -25,7 +25,9 @@ Blog by Jeff Kisling at <https://quakersandreligioussocialism.com>.[^blog]
 
 | | |
 |---|---|
-| Posts in the catalog | 381 |
+| Posts published | 381 |
+| Shown in the catalog | 381 |
+| Left out as copies of a newer post on another blog | 0 |
 | First post | 2022-01-19 |
 | Most recent post | 2024-02-02 |
 
