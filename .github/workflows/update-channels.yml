@@ -1,0 +1,53 @@
+name: Update from Channels Into Knowledge
+
+# Checks https://channelsintoknowledge.com/ for new posts, adds them to the
+# catalog, re-checks OKF v0.2 conformance, and commits only when something
+# changed. GitHub Pages republishes the catalog after each commit.
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"   # every six hours, at 17 past the hour (UTC)
+  workflow_dispatch:          # "Run workflow" button on the Actions tab
+  push:
+    branches: [main]
+    paths:
+      - "scripts/**"
+      - ".github/workflows/update-channels.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-channels
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install PyYAML for the OKF check
+        run: pip install pyyaml
+
+      - name: Fetch new posts
+        run: python3 scripts/update_channels.py
+
+      - name: Check OKF v0.2 conformance
+        run: python3 scripts/okf_validate.py
+
+      - name: Commit changes, if any
+        run: |
+          if git diff --quiet && [ -z "$(git status --porcelain)" ]; then
+            echo "No new posts."
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Add new posts from Channels Into Knowledge"
+          git push
