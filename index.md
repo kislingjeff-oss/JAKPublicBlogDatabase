@@ -10,4 +10,5 @@ okf_version: "0.2"
 
 # Search
 
+* [Open the research desk](https://kislingjeff-oss.github.io/JAKPublicBlogDatabase/desk/) - Search every post, select articles and export a linked reading list with summaries.
 * [Open the catalog](https://kislingjeff-oss.github.io/JAKPublicBlogDatabase/) - Search every post by blog, year, tag or your own words.

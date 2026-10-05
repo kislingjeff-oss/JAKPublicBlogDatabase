@@ -1,0 +1,839 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Journal Research Desk</title>
+<meta name="description" content="Search, browse and export Jeff Kisling's blog posts, 2015 to 2026.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: a calm research desk. Header and tab bar on top; on wide screens the
+   Search tab pairs a filter column with a paged result list. One light theme. */
+:root{
+  --paper:#f7f9f8;        /* page ground: cool, slightly green-tinted white */
+  --card:#ffffff;         /* raised surfaces */
+  --mist:#eaf1ef;         /* quiet fills, hover, chips */
+  --line:#d8e2df;         /* hairlines and borders */
+  --ink:#000000;          /* main text */
+  --ink-2:#000000;        /* secondary text */
+  --ink-3:#2b2b2b;        /* captions */
+  --accent:#2f6b5e;       /* prairie green: links, primary actions */
+  --accent-2:#e3efe9;     /* accent tint */
+  --sky:#e6eef6;          /* selected rows */
+  --mark:#fbeeb8;         /* search highlight */
+  --danger:#a23b2c;
+  --font-ui:"Hanken Grotesk",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --font-read:"Hanken Grotesk",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --font-data:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --r:10px;
+  --shadow:0 1px 2px rgba(29,42,44,.06),0 4px 14px rgba(29,42,44,.05);
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{background:var(--paper);color:var(--ink)}
+body{margin:0;font:16px/1.55 var(--font-ui);-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-underline-offset:2px}
+a:hover{text-decoration-thickness:2px}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid #7fb3a5;outline-offset:2px;border-radius:4px}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:clamp(16px,3vw,32px)}
+body.wide .wrap{max-width:1720px}
+
+/* Header */
+header.top{background:var(--card);border-bottom:1px solid var(--line)}
+.brand{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;padding-block:22px 14px}
+.brand h1{margin:0;font:600 clamp(1.5rem,3vw,2rem)/1.15 var(--font-read);letter-spacing:-.01em;text-wrap:balance}
+.brand p{margin:4px 0 0;color:var(--ink-2);font-size:.95rem}
+.stats{display:flex;gap:18px;flex-wrap:wrap;font-variant-numeric:tabular-nums}
+.stat b{display:block;font:600 1.15rem/1.1 var(--font-ui)}
+.stat span{font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+
+/* Tabs */
+nav.tabs{overflow:hidden;position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--card);border-bottom:1px solid var(--line)}
+.tablist{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;max-width:100%}
+.tablist::-webkit-scrollbar{display:none}
+.tab{appearance:none;border:0;background:none;padding:12px 14px 11px;font-weight:600;color:var(--ink-2);border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:8px;flex:none}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+.count-pill{min-width:22px;padding:1px 7px;border-radius:999px;background:var(--mist);color:var(--ink-2);font-size:.75rem;font-variant-numeric:tabular-nums;text-align:center}
+.tab[aria-selected="true"] .count-pill{background:var(--accent);color:#fff}
+
+main{padding-block:24px 56px}
+.panel h2{font:600 1.35rem/1.2 var(--font-read);margin:0 0 4px}
+.lede{color:var(--ink-2);margin:0 0 18px;max-width:68ch}
+
+/* Search layout */
+.search-grid{display:grid;grid-template-columns:280px minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:860px){.search-grid{grid-template-columns:minmax(0,1fr)}}
+.filters{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.filters-body{display:grid;gap:18px}
+.filters summary{display:none}
+@media (max-width:860px){.filters{padding:0}.filters summary{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;font-weight:600;cursor:pointer;list-style:none}.filters summary::-webkit-details-marker{display:none}.filters summary::after{content:"Show";color:var(--accent);font-size:.88rem}.filters details[open] summary::after{content:"Hide"}.filters-body{padding:0 16px 16px}}
+@media (min-width:861px){.filters{position:sticky;top:64px}}
+.field{display:grid;gap:6px}
+.label{font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)}
+.input,.select{width:100%;border:1px solid var(--line);background:var(--card);border-radius:8px;padding:9px 11px}
+.input:focus,.select:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px var(--accent-2)}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.row>.select{flex:1;min-width:0}
+.blog-list{display:grid;gap:4px}
+.check{display:flex;align-items:center;gap:8px;font-size:.92rem;padding:4px 6px;border-radius:6px;cursor:pointer}
+.check:hover{background:var(--mist)}
+.check input{accent-color:var(--accent);width:16px;height:16px;flex:none}
+.check .n{margin-left:auto;color:var(--ink-3);font-size:.8rem;font-variant-numeric:tabular-nums}
+.dot{width:9px;height:9px;border-radius:50%;flex:none}
+.hint{font-size:.8rem;color:var(--ink-3);margin:0}
+
+.searchbar{display:flex;gap:8px;margin-bottom:14px}
+.searchbar .input{font-size:1.05rem;padding:12px 14px}
+.btn{appearance:none;border:1px solid var(--line);background:var(--card);border-radius:8px;padding:8px 13px;font-weight:600;font-size:.9rem;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn:hover{background:var(--mist)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:#285c51}
+.btn.ghost{border-color:transparent;background:none;color:var(--accent)}
+.btn.ghost:hover{background:var(--accent-2)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+#reset{background:#f6cfcb;border-color:#e8aaa3}
+#reset:hover{background:#f0bab4}
+
+.toolbar{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);margin-bottom:12px}
+.toolbar .summary{font-variant-numeric:tabular-nums;color:var(--ink-2)}
+.toolbar .summary b{color:var(--ink)}
+.active-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--mist);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.82rem}
+.chip button{border:0;background:none;padding:0;cursor:pointer;color:var(--ink-3);font-size:1rem;line-height:1}
+
+/* Result cards */
+.results{display:grid;gap:10px}
+.result{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 14px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+.result.is-selected{background:var(--sky);border-color:#bfd1e2}
+.result .pick{padding-top:4px}
+.result .pick input{accent-color:var(--accent);width:18px;height:18px;cursor:pointer}
+.result h3{margin:0;font:700 1.08rem/1.35 var(--font-ui)}
+.result h3 a{color:var(--ink);text-decoration:none}
+.result h3 a:hover{color:var(--accent);text-decoration:underline}
+.meta{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:.82rem;color:var(--ink-3);margin-top:3px;font-variant-numeric:tabular-nums}
+.blog-tag{display:inline-flex;align-items:center;gap:6px;color:var(--ink-2);font-weight:600}
+.result h3,.result .sum,.also,.sel-list a,.chip{overflow-wrap:anywhere}
+.result .sum{grid-column:2;margin:6px 0 0;font:400 1rem/1.6 var(--font-ui);color:#000000;max-width:120ch}
+.result .sum.empty{font:italic .92rem/1.5 var(--font-ui);color:var(--ink-3)}
+.tags{grid-column:2;display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.tagbtn{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:1px 9px;font-size:.76rem;color:var(--ink-2);cursor:pointer}
+.tagbtn:hover{border-color:var(--accent);color:var(--accent)}
+.also{grid-column:2;font-size:.8rem;color:var(--ink-3);margin-top:6px}
+mark{background:var(--mark);color:inherit;border-radius:2px;padding:0 1px}
+.empty-state{background:var(--card);border:1px dashed var(--line);border-radius:var(--r);padding:28px;text-align:center;color:var(--ink-2)}
+
+/* Pager */
+.pager{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:center;margin-top:20px}
+.pager .btn{min-width:38px;justify-content:center;font-variant-numeric:tabular-nums}
+.pager .btn[aria-current="page"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.pager .gap{color:var(--ink-3);padding:0 2px}
+
+/* Browse */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.blogcard{text-align:left;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;cursor:pointer;display:grid;gap:6px}
+.blogcard:hover{border-color:var(--accent);box-shadow:var(--shadow)}
+.blogcard h3{margin:0;font:600 1.05rem/1.3 var(--font-read);display:flex;gap:8px;align-items:center}
+.blogcard .big{font:700 1.6rem/1 var(--font-ui);font-variant-numeric:tabular-nums}
+.blogcard small{color:var(--ink-3);font-variant-numeric:tabular-nums}
+.section{margin-top:34px}
+.section h3.sh{font:600 1.1rem/1.3 var(--font-read);margin:0 0 4px}
+.chart-wrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 16px 10px}
+.years{display:flex;align-items:flex-end;gap:8px;height:200px;min-width:560px}
+.yearcol{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;cursor:pointer;border:0;background:none;padding:0;gap:4px}
+.yearcol .stack{width:100%;max-width:46px;display:flex;flex-direction:column-reverse;border-radius:5px 5px 0 0;overflow:hidden;min-height:2px}
+.yearcol .stack span{display:block}
+.yearcol .v{font-size:.75rem;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.yearcol .y{font-size:.78rem;color:var(--ink-3);font-variant-numeric:tabular-nums;border-top:1px solid var(--line);width:100%;text-align:center;padding-top:4px}
+.yearcol:hover .stack{filter:brightness(.92)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;font-size:.8rem;color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.cloud{display:flex;flex-wrap:wrap;gap:6px}
+.cloud .tagbtn{font-size:.85rem;padding:3px 11px;background:var(--card)}
+.cloud .tagbtn small{color:var(--ink-3);font-variant-numeric:tabular-nums;margin-left:4px}
+
+/* Selected + export */
+.export-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:24px;align-items:start}
+@media (max-width:920px){.export-grid{grid-template-columns:minmax(0,1fr)}}
+.box{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.sel-list{list-style:none;margin:0;padding:0;display:grid;gap:2px;max-height:620px;overflow:auto}
+.sel-list li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:start;padding:9px 6px;border-bottom:1px solid var(--mist)}
+.sel-list li:last-child{border-bottom:0}
+.sel-list a{font-weight:600;text-decoration:none;color:var(--ink)}
+.sel-list a:hover{color:var(--accent);text-decoration:underline}
+.sel-list .meta{margin-top:1px}
+.iconbtn{border:0;background:none;color:var(--ink-3);cursor:pointer;padding:2px 6px;border-radius:6px;font-size:1.1rem;line-height:1}
+.iconbtn:hover{background:var(--mist);color:var(--danger)}
+.opts{display:grid;gap:12px}
+.seg{display:flex;flex-wrap:wrap;border:1px solid var(--line);border-radius:8px;overflow:hidden;width:max-content;max-width:100%}
+.seg button{border:0;background:var(--card);padding:7px 12px;font-size:.88rem;font-weight:600;cursor:pointer;color:var(--ink-2);border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#fff}
+.optrow{display:flex;flex-wrap:wrap;gap:4px 16px}
+.preview{margin-top:14px}
+.preview textarea{width:100%;min-height:340px;border:1px solid var(--line);border-radius:8px;padding:12px;font:13px/1.55 var(--font-data);background:var(--paper);resize:vertical}
+.preview .rendered{border:1px solid var(--line);border-radius:8px;padding:14px 18px;background:var(--paper);max-height:520px;overflow:auto;font:400 1rem/1.55 var(--font-ui);color:#000000}
+.preview .rendered h2{font:700 1.2rem/1.3 var(--font-ui);margin:0 0 4px}
+.preview .rendered ol{padding-left:1.4em}
+.preview .rendered li{margin-bottom:12px}
+.preview .rendered p{margin:4px 0}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;align-items:center}
+.status{font-size:.85rem;color:var(--accent);min-height:1.3em}
+
+/* About */
+.prose{max-width:70ch}
+.prose h3{font:600 1.1rem/1.3 var(--font-read);margin:26px 0 6px}
+.prose p,.prose li{color:#000000}
+.prose code{font:13px var(--font-data);background:var(--mist);padding:1px 5px;border-radius:4px}
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.9rem;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line)}
+th{font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+td.num,th.num{text-align:right}
+
+footer{border-top:1px solid var(--line);padding-block:18px;color:var(--ink-3);font-size:.82rem}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+
+<header class="top">
+  <div class="wrap brand">
+    <div>
+      <h1 id="app-title">Journal Research Desk</h1>
+      <p id="app-subtitle"></p>
+    </div>
+    <div class="stats" id="stats"></div>
+  </div>
+</header>
+
+<nav class="tabs" aria-label="Sections">
+  <div class="wrap tablist" role="tablist">
+    <button class="tab" role="tab" id="tab-search" aria-controls="panel-search" aria-selected="true">Search</button>
+    <button class="tab" role="tab" id="tab-selected" aria-controls="panel-selected" aria-selected="false" tabindex="-1">Selected &amp; Export <span class="count-pill" id="sel-count">0</span></button>
+    <button class="tab" role="tab" id="tab-browse" aria-controls="panel-browse" aria-selected="false" tabindex="-1">Browse</button>
+    <button class="tab" role="tab" id="tab-about" aria-controls="panel-about" aria-selected="false" tabindex="-1">About</button>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <!-- SEARCH -->
+  <section class="panel" id="panel-search" role="tabpanel" aria-labelledby="tab-search">
+    <form class="searchbar" id="search-form" role="search">
+      <label class="sr" for="q">Search the posts</label>
+      <input class="input" id="q" type="search" autocomplete="off" placeholder="Search titles, tags and full text, for example: mutual aid  &quot;Dakota Access&quot;  -Iowa">
+      <button class="btn primary" type="submit">Search</button>
+    </form>
+    <div class="search-grid">
+      <aside class="filters" aria-label="Filters"><details id="filters-details" open><summary>Filters</summary><div class="filters-body">
+        <button class="btn" type="button" id="reset">Reset filters</button>
+
+        <div class="field">
+          <span class="label">Years</span>
+          <div class="row">
+            <label class="sr" for="year-from">From year</label><select class="select" id="year-from"></select>
+            <span aria-hidden="true">to</span>
+            <label class="sr" for="year-to">To year</label><select class="select" id="year-to"></select>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label" for="tag">Tag</label>
+          <input class="input" id="tag" list="tag-options" placeholder="Any tag">
+          <datalist id="tag-options"></datalist>
+        </div>
+        <div class="field">
+          <label class="label" for="sort">Sort by</label>
+          <select class="select" id="sort">
+            <option value="relevance">Best match</option>
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+            <option value="title">Title, A to Z</option>
+            <option value="longest">Longest first</option>
+          </select>
+        </div>
+        <p class="hint">Words must all appear. Put a phrase in quotes. Put a minus sign before a word to leave it out.</p>
+        <div class="field">
+          <span class="label">Blogs</span>
+          <div class="blog-list" id="blog-filter"></div>
+          <div class="row"><button class="btn ghost" type="button" id="blogs-all">All</button><button class="btn ghost" type="button" id="blogs-none">None</button></div>
+        </div>
+      </div></details></aside>
+
+      <div style="min-width:0">
+        <div class="active-filters" id="active-filters"></div>
+        <div class="toolbar">
+          <div class="summary" id="result-summary" aria-live="polite"></div>
+          <div class="row">
+            <button class="btn" type="button" id="sel-page">Select page</button>
+            <button class="btn" type="button" id="sel-all">Select all results</button>
+            <label class="sr" for="page-size">Results per page</label>
+            <select class="select" id="page-size" style="width:auto">
+              <option value="10">10 per page</option>
+              <option value="25" selected>25 per page</option>
+              <option value="50">50 per page</option>
+              <option value="100">100 per page</option>
+            </select>
+          </div>
+        </div>
+        <div class="results" id="results"></div>
+        <nav class="pager" id="pager" aria-label="Result pages"></nav>
+      </div>
+    </div>
+  </section>
+
+  <!-- BROWSE -->
+  <section class="panel" id="panel-browse" role="tabpanel" aria-labelledby="tab-browse" hidden>
+    <h2>Browse the library</h2>
+    <p class="lede">Choose a blog, a year or a tag to see those posts in Search.</p>
+    <div class="cards" id="blog-cards"></div>
+    <div class="section">
+      <h3 class="sh">Posts per year</h3>
+      <p class="hint" style="margin-bottom:10px">Each bar is split by blog. Select a year to list its posts.</p>
+      <div class="chart-wrap"><div class="years" id="year-chart"></div><div class="legend" id="legend"></div></div>
+    </div>
+    <div class="section">
+      <h3 class="sh">Most used tags</h3>
+      <p class="hint" style="margin-bottom:10px">The number after each tag is how many posts use it.</p>
+      <div class="cloud" id="tag-cloud"></div>
+    </div>
+  </section>
+
+  <!-- SELECTED & EXPORT -->
+  <section class="panel" id="panel-selected" role="tabpanel" aria-labelledby="tab-selected" hidden>
+    <h2>Selected articles</h2>
+    <p class="lede">Build a reading list, then copy it or download it. Every title in the export links to the original post.</p>
+    <div class="export-grid">
+      <div class="box">
+        <div class="toolbar" style="padding-top:0">
+          <div class="summary" id="sel-summary"></div>
+          <button class="btn" type="button" id="sel-clear">Clear all</button>
+        </div>
+        <ul class="sel-list" id="sel-list"></ul>
+      </div>
+      <div class="box">
+        <div class="opts">
+          <div class="field">
+            <label class="label" for="list-title">List title</label>
+            <input class="input" id="list-title" value="Reading list">
+          </div>
+          <div class="field">
+            <span class="label" id="fmt-label">Format</span>
+            <div class="seg" role="group" aria-labelledby="fmt-label" id="fmt">
+              <button type="button" data-fmt="html" aria-pressed="true">Rich text</button>
+              <button type="button" data-fmt="md" aria-pressed="false">Markdown</button>
+              <button type="button" data-fmt="txt" aria-pressed="false">Plain text</button>
+              <button type="button" data-fmt="csv" aria-pressed="false">CSV</button>
+            </div>
+          </div>
+          <div class="field">
+            <span class="label">Include</span>
+            <div class="optrow">
+              <label class="check"><input type="checkbox" id="opt-summary" checked> Summary of each article</label>
+              <label class="check"><input type="checkbox" id="opt-meta" checked> Blog and date</label>
+              <label class="check"><input type="checkbox" id="opt-tags"> Tags</label>
+              <label class="check"><input type="checkbox" id="opt-also"> Other copies</label>
+              <label class="check"><input type="checkbox" id="opt-num" checked> Numbered list</label>
+            </div>
+          </div>
+          <div class="field">
+            <label class="label" for="opt-order">Order</label>
+            <select class="select" id="opt-order">
+              <option value="added">Order selected</option>
+              <option value="newest">Newest first</option>
+              <option value="oldest">Oldest first</option>
+              <option value="blog">By blog, then date</option>
+              <option value="title">Title, A to Z</option>
+            </select>
+          </div>
+        </div>
+        <div class="preview">
+          <span class="label">Preview</span>
+          <div class="rendered" id="preview-html" style="margin-top:6px"></div>
+          <label class="sr" for="preview-text">Export text</label>
+          <textarea id="preview-text" readonly hidden></textarea>
+        </div>
+        <div class="actions">
+          <button class="btn primary" type="button" id="copy">Copy</button>
+          <button class="btn" type="button" id="download">Download file</button>
+          <span class="status" id="export-status" role="status"></span>
+        </div>
+        <p class="hint" style="margin-top:8px">Summaries are the opening sentences of each post, in the author's own words.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="panel" id="panel-about" role="tabpanel" aria-labelledby="tab-about" hidden>
+    <div class="prose">
+      <h2>About this library</h2>
+      <p id="about-intro"></p>
+      <div class="tbl-wrap"><table id="about-table"></table></div>
+      <h3>How search works</h3>
+      <ul>
+        <li>Type one or more words. A post matches when every word appears in its title, tags, summary or full text. Words also match their longer forms, so <code>colon</code> finds <code>colonialism</code>.</li>
+        <li>Put words in quotes, such as <code>"mutual aid"</code>, to find them together as a phrase.</li>
+        <li>Put a minus sign before a word, such as <code>-Iowa</code>, to leave out posts that use it.</li>
+        <li>Best match ranks title matches first, then tags, then summaries, then the rest of the text.</li>
+      </ul>
+      <h3>Exporting</h3>
+      <p>Tick the box beside any result to add it to your selection. In the Selected &amp; Export tab, choose a format and whether to include a summary of each article, then copy the list or download it. Rich text pastes into email and word processors with working links. Your selection is kept in this browser until you clear it.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap" id="footer-text"></div>
+</footer>
+
+<script type="application/json" id="library-data">__DATA__</script>
+<script>
+(function(){
+"use strict";
+
+/* ---------- Settings: change these to reuse the template ---------- */
+var CONFIG = {
+  title: "Journal Research Desk",
+  author: "Jeff Kisling",
+  storageKey: "journal-desk-v1",
+  blogColors: ["#c98a6b","#6b9ac9","#8fb07a","#b58cc4","#d4b25e","#6fb8b0","#5f8a7d","#c47a8e","#8a8fc4","#a3a36b"]
+};
+
+/* ---------- Data ---------- */
+var DATA, POSTS, BLOGS, BYURL;
+function loadData(obj){
+  DATA = obj; BLOGS = obj.blogs; POSTS = obj.posts; BYURL = {};
+  POSTS.forEach(function(p, i){
+    p.i = i;
+    p.y = +p.d.slice(0,4);
+    p._t = norm(p.t);
+    p._g = (p.g||[]).map(norm).join(" | ");
+    p._s = norm(p.s||"");
+    p._x = " " + norm(p.x||"") + " ";
+    BYURL[p.u] = p;
+  });
+  BLOGS.forEach(function(b, i){ b.color = CONFIG.blogColors[i % CONFIG.blogColors.length]; });
+}
+function norm(s){ return String(s).toLowerCase().replace(/[\u2018\u2019]/g,"'").replace(/[\u201c\u201d]/g,'"').normalize("NFKD").replace(/[\u0300-\u036f]/g,""); }
+function esc(s){ return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
+function fmtNum(n){ return n.toLocaleString("en-US"); }
+function fmtDate(d){ var p=d.split("-"); var m=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][+p[1]-1]; return m+" "+(+p[2])+", "+p[0]; }
+function $(id){ return document.getElementById(id); }
+
+/* ---------- Saved state (per browser, optional) ---------- */
+var selected = [];               // array of urls, in the order selected
+function save(){ try{ localStorage.setItem(CONFIG.storageKey, JSON.stringify({sel:selected})); }catch(e){} }
+function restore(){ try{ var s=JSON.parse(localStorage.getItem(CONFIG.storageKey)||"{}"); if(Array.isArray(s.sel)) selected=s.sel.filter(function(u){return BYURL[u];}); }catch(e){} }
+
+/* ---------- Search state ---------- */
+var S = { q:"", blogs:null, from:0, to:9999, tag:"", sort:"relevance", page:1, size:25 };
+var lastResults = [];
+
+function parseQuery(q){
+  var terms=[], re=/(-?)"([^"]+)"|(-?)(\S+)/g, m;
+  while((m=re.exec(norm(q)))){
+    if(m[2]) terms.push({neg:!!m[1], phrase:true, v:m[2].trim()});
+    else { var v=m[4].replace(/^[^a-z0-9]+|[^a-z0-9']+$/g,""); if(v) terms.push({neg:!!m[3], phrase:false, v:v}); }
+  }
+  return terms;
+}
+function termScore(p, t){
+  var s=0, v=t.v;
+  if(p._t.indexOf(v)>-1) s+=8;
+  if(p._g.indexOf(v)>-1) s+=5;
+  if(p._s.indexOf(v)>-1) s+=3;
+  if(t.phrase){
+    if(!s){ var ws=v.split(/\s+/); if(ws.every(function(w){return p._x.indexOf(" "+w)>-1;})) s+=1; }
+  } else if(p._x.indexOf(" "+v)>-1) s+=1;
+  return s;
+}
+function runSearch(){
+  var terms=parseQuery(S.q), pos=terms.filter(function(t){return !t.neg;}), neg=terms.filter(function(t){return t.neg;});
+  var tag=norm(S.tag.trim()), out=[];
+  for(var i=0;i<POSTS.length;i++){
+    var p=POSTS[i];
+    if(S.blogs && !S.blogs.has(p.b)) continue;
+    if(p.y<S.from || p.y>S.to) continue;
+    if(tag && !(p.g||[]).some(function(g){return norm(g)===tag;})) continue;
+    var score=0, ok=true;
+    for(var j=0;j<pos.length;j++){ var sc=termScore(p,pos[j]); if(!sc){ok=false;break;} score+=sc; }
+    if(!ok) continue;
+    for(var k=0;k<neg.length;k++){ if(termScore(p,neg[k])){ok=false;break;} }
+    if(!ok) continue;
+    out.push({p:p, score:score});
+  }
+  var by={
+    relevance:function(a,b){ return (b.score-a.score) || (a.p.d<b.p.d?1:-1); },
+    newest:function(a,b){ return a.p.d<b.p.d?1:a.p.d>b.p.d?-1:0; },
+    oldest:function(a,b){ return a.p.d>b.p.d?1:a.p.d<b.p.d?-1:0; },
+    title:function(a,b){ return a.p.t.localeCompare(b.p.t); },
+    longest:function(a,b){ return b.p.w-a.p.w; }
+  };
+  var sort = (S.sort==="relevance" && !pos.length) ? "newest" : S.sort;
+  out.sort(by[sort]);
+  lastResults = out.map(function(r){return r.p;});
+  return pos;
+}
+
+function highlight(text, pos){
+  var h=esc(text);
+  if(!pos.length) return h;
+  var words=[]; pos.forEach(function(t){ (t.phrase?[t.v]:[t.v]).forEach(function(w){ if(w.length>1) words.push(w); }); });
+  if(!words.length) return h;
+  words.sort(function(a,b){return b.length-a.length;});
+  var re=new RegExp("("+words.map(function(w){return w.replace(/[.*+?^${}()|[\]\\]/g,"\\$&").replace(/'/g,"['\u2019]");}).join("|")+")","gi");
+  return h.replace(/(<[^>]+>)|([^<]+)/g,function(m,tagPart,txt){ return tagPart?tagPart:txt.replace(re,"<mark>$1</mark>"); });
+}
+
+/* ---------- Rendering: Search ---------- */
+function renderResults(){
+  var pos=runSearch(), total=lastResults.length;
+  var pages=Math.max(1,Math.ceil(total/S.size));
+  if(S.page>pages) S.page=pages;
+  var start=(S.page-1)*S.size, slice=lastResults.slice(start,start+S.size);
+  $("result-summary").innerHTML = total
+    ? "<b>"+fmtNum(total)+"</b> "+(total===1?"post":"posts")+" &middot; showing "+fmtNum(start+1)+"&ndash;"+fmtNum(start+slice.length)
+    : "No posts match";
+  var html="";
+  slice.forEach(function(p){
+    var b=BLOGS[p.b], isSel=selected.indexOf(p.u)>-1;
+    html+='<article class="result'+(isSel?' is-selected':'')+'">'
+      +'<div class="pick"><input type="checkbox" data-url="'+esc(p.u)+'" aria-label="Select '+esc(p.t)+'"'+(isSel?' checked':'')+'></div>'
+      +'<div style="min-width:0"><h3><a href="'+esc(p.u)+'" target="_blank" rel="noopener">'+highlight(p.t,pos)+'</a></h3>'
+      +'<div class="meta"><span class="blog-tag"><span class="dot" style="background:'+b.color+'"></span>'+esc(b.name)+'</span>'
+      +'<span>'+fmtDate(p.d)+'</span><span>'+fmtNum(p.w)+' words &middot; '+Math.max(1,Math.round(p.w/230))+' min read</span></div></div>'
+      +(p.s?'<p class="sum">'+highlight(p.s,pos)+'</p>':'<p class="sum empty">No summary text. This post is mostly images or embedded media.</p>')
+      +((p.g&&p.g.length)?'<div class="tags">'+p.g.slice(0,10).map(function(g){return '<button type="button" class="tagbtn" data-tag="'+esc(g)+'">'+esc(g)+'</button>';}).join("")+'</div>':'')
+      +((p.a&&p.a.length)?'<div class="also">Also published at '+p.a.map(function(u){return '<a href="'+esc(u)+'" target="_blank" rel="noopener">'+esc(u.replace(/^https?:\/\//,"").split("/")[0])+'</a>';}).join(", ")+'</div>':'')
+      +'</article>';
+  });
+  $("results").innerHTML = html || '<div class="empty-state"><p><b>No posts match these filters.</b></p><p>Try fewer words, another spelling, or more blogs and years.</p></div>';
+  renderPager(pages);
+  renderActiveFilters();
+  updatePageBtn();
+}
+function pageAllSelected(){
+  var start=(S.page-1)*S.size, pg=lastResults.slice(start,start+S.size);
+  return pg.length>0 && pg.every(function(p){return selected.indexOf(p.u)>-1;});
+}
+function updatePageBtn(){ $("sel-page").textContent = pageAllSelected() ? "Deselect page" : "Select page"; }
+function renderPager(pages){
+  if(pages<=1){ $("pager").innerHTML=""; return; }
+  var cur=S.page, h='<button class="btn" type="button" data-page="'+(cur-1)+'"'+(cur===1?' disabled':'')+'>Previous</button>';
+  var set=[1,pages,cur-1,cur,cur+1,cur-2,cur+2].filter(function(n){return n>=1&&n<=pages;});
+  set=Array.from(new Set(set)).sort(function(a,b){return a-b;});
+  var prev=0;
+  set.forEach(function(n){
+    if(n-prev>1) h+='<span class="gap" aria-hidden="true">&hellip;</span>';
+    h+='<button class="btn" type="button" data-page="'+n+'"'+(n===cur?' aria-current="page"':'')+'>'+n+'</button>';
+    prev=n;
+  });
+  h+='<button class="btn" type="button" data-page="'+(cur+1)+'"'+(cur===pages?' disabled':'')+'>Next</button>';
+  $("pager").innerHTML=h;
+}
+function renderActiveFilters(){
+  var chips=[];
+  if(S.q) chips.push(["q","Search: "+S.q]);
+  if(S.blogs && S.blogs.size<BLOGS.length) chips.push(["blogs", S.blogs.size+" of "+BLOGS.length+" blogs"]);
+  if(S.from>minYear || S.to<maxYear) chips.push(["years", S.from===S.to? "Year "+S.from : S.from+" to "+S.to]);
+  if(S.tag) chips.push(["tag","Tag: "+S.tag]);
+  $("active-filters").innerHTML = chips.map(function(c){ return '<span class="chip">'+esc(c[1])+'<button type="button" data-clear="'+c[0]+'" aria-label="Remove filter">&times;</button></span>'; }).join("");
+}
+
+/* ---------- Filters UI ---------- */
+var minYear, maxYear;
+function buildFilters(){
+  minYear=Math.min.apply(null,POSTS.map(function(p){return p.y;}));
+  maxYear=Math.max.apply(null,POSTS.map(function(p){return p.y;}));
+  S.from=minYear; S.to=maxYear;
+  var counts=BLOGS.map(function(){return 0;}); POSTS.forEach(function(p){counts[p.b]++;});
+  $("blog-filter").innerHTML = BLOGS.map(function(b,i){
+    return '<label class="check"><input type="checkbox" data-blog="'+i+'" checked><span class="dot" style="background:'+b.color+'"></span><span>'+esc(shortName(b.name))+'</span><span class="n">'+fmtNum(counts[i])+'</span></label>';
+  }).join("");
+  var opts=""; for(var y=minYear;y<=maxYear;y++) opts+='<option value="'+y+'">'+y+'</option>';
+  $("year-from").innerHTML=opts; $("year-to").innerHTML=opts;
+  syncFilterInputs();
+  var tagCount=tagCounts();
+  $("tag-options").innerHTML = tagCount.map(function(t){return '<option value="'+esc(t[0])+'">';}).join("");
+}
+function shortName(n){ return n.replace(/\s*\(.*\)\s*$/,""); }
+function syncFilterInputs(){
+  $("q").value=S.q; $("year-from").value=S.from; $("year-to").value=S.to; $("tag").value=S.tag; $("sort").value=S.sort; $("page-size").value=S.size;
+  Array.prototype.forEach.call(document.querySelectorAll("[data-blog]"),function(cb){ cb.checked = !S.blogs || S.blogs.has(+cb.dataset.blog); });
+}
+var _tagCounts=null;
+function tagCounts(){
+  if(_tagCounts) return _tagCounts;
+  var m={};
+  POSTS.forEach(function(p){ (p.g||[]).forEach(function(g){ var k=norm(g); if(!m[k]) m[k]={name:g,n:0}; m[k].n++; }); });
+  _tagCounts=Object.keys(m).map(function(k){return [m[k].name,m[k].n];}).sort(function(a,b){return b[1]-a[1];});
+  return _tagCounts;
+}
+function readBlogChecks(){
+  var s=new Set(); Array.prototype.forEach.call(document.querySelectorAll("[data-blog]"),function(cb){ if(cb.checked) s.add(+cb.dataset.blog); });
+  S.blogs = s.size===BLOGS.length ? null : s;
+}
+function update(){ S.page=1; renderResults(); }
+
+/* ---------- Browse ---------- */
+function renderBrowse(){
+  $("blog-cards").innerHTML = BLOGS.map(function(b,i){
+    return '<button type="button" class="blogcard" data-goblog="'+i+'"><h3><span class="dot" style="background:'+b.color+'"></span>'+esc(b.name)+'</h3>'
+      +'<span class="big">'+fmtNum(b.count)+'</span><small>posts &middot; '+fmtDate(b.first)+' to '+fmtDate(b.last)+'</small></button>';
+  }).join("");
+  var years={}, maxN=0;
+  POSTS.forEach(function(p){ years[p.y]=years[p.y]||BLOGS.map(function(){return 0;}); years[p.y][p.b]++; });
+  for(var y=minYear;y<=maxYear;y++){ var t=(years[y]||[]).reduce(function(a,b){return a+b;},0); if(t>maxN) maxN=t; }
+  var h="";
+  for(y=minYear;y<=maxYear;y++){
+    var arr=years[y]||[], tot=arr.reduce(function(a,b){return a+b;},0), pct=maxN?tot/maxN*82:0;
+    h+='<button type="button" class="yearcol" data-goyear="'+y+'" aria-label="'+y+': '+tot+' posts"><span class="v">'+fmtNum(tot)+'</span><span class="stack" style="height:'+pct.toFixed(1)+'%">'
+      +arr.map(function(n,i){ return n?'<span style="flex:'+n+' 1 0;background:'+BLOGS[i].color+'" title="'+esc(BLOGS[i].name)+': '+n+'"></span>':''; }).join("")
+      +'</span><span class="y">'+y+'</span></button>';
+  }
+  $("year-chart").innerHTML=h;
+  $("legend").innerHTML=BLOGS.map(function(b){return '<span><span class="dot" style="background:'+b.color+'"></span>'+esc(shortName(b.name))+'</span>';}).join("");
+  $("tag-cloud").innerHTML=tagCounts().slice(0,60).map(function(t){ return '<button type="button" class="tagbtn" data-tag="'+esc(t[0])+'">'+esc(t[0])+'<small>'+t[1]+'</small></button>'; }).join("");
+}
+
+/* ---------- Selection ---------- */
+function toggleSel(url, on){
+  var i=selected.indexOf(url);
+  if(on && i<0) selected.push(url);
+  if(!on && i>-1) selected.splice(i,1);
+  save(); updateSelCount();
+}
+function updateSelCount(){ $("sel-count").textContent=fmtNum(selected.length); }
+function orderedSelection(){
+  var list=selected.map(function(u){return BYURL[u];}).filter(Boolean);
+  var o=$("opt-order").value;
+  if(o==="newest") list.sort(function(a,b){return a.d<b.d?1:-1;});
+  if(o==="oldest") list.sort(function(a,b){return a.d>b.d?1:-1;});
+  if(o==="title") list.sort(function(a,b){return a.t.localeCompare(b.t);});
+  if(o==="blog") list.sort(function(a,b){return (a.b-b.b) || (a.d>b.d?1:-1);});
+  return list;
+}
+function renderSelected(){
+  var list=selected.map(function(u){return BYURL[u];}).filter(Boolean);
+  $("sel-summary").innerHTML = list.length ? "<b>"+fmtNum(list.length)+"</b> selected" : "Nothing selected yet";
+  $("sel-list").innerHTML = list.length ? list.map(function(p){
+    var b=BLOGS[p.b];
+    return '<li><div style="min-width:0"><a href="'+esc(p.u)+'" target="_blank" rel="noopener">'+esc(p.t)+'</a><div class="meta"><span class="blog-tag"><span class="dot" style="background:'+b.color+'"></span>'+esc(shortName(b.name))+'</span><span>'+fmtDate(p.d)+'</span></div></div>'
+      +'<button type="button" class="iconbtn" data-unsel="'+esc(p.u)+'" aria-label="Remove '+esc(p.t)+'">&times;</button></li>';
+  }).join("") : '<li style="display:block;color:var(--ink-3);padding:18px 6px">Tick the box beside any search result to add it here.</li>';
+  renderExport();
+}
+
+/* ---------- Export ---------- */
+var FMT="html";
+function opts(){ return { sum:$("opt-summary").checked, meta:$("opt-meta").checked, tags:$("opt-tags").checked, also:$("opt-also").checked, num:$("opt-num").checked, title:$("list-title").value.trim()||"Reading list" }; }
+function today(){ var d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function mdEsc(s){ return String(s).replace(/([\[\]])/g,"\\$1"); }
+function csvCell(s){ s=String(s==null?"":s); return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; }
+function buildExport(fmt){
+  var o=opts(), list=orderedSelection(), n=list.length;
+  var note="Exported "+today()+" from "+CONFIG.title+". "+n+" "+(n===1?"article":"articles")+".";
+  if(fmt==="csv"){
+    var head=["Title","URL"]; if(o.meta) head.push("Blog","Date"); if(o.tags) head.push("Tags"); if(o.sum) head.push("Summary"); if(o.also) head.push("Other copies");
+    var rows=[head.join(",")];
+    list.forEach(function(p){
+      var r=[p.t,p.u]; if(o.meta) r.push(BLOGS[p.b].name,p.d); if(o.tags) r.push((p.g||[]).join("; ")); if(o.sum) r.push(p.s||""); if(o.also) r.push((p.a||[]).join(" "));
+      rows.push(r.map(csvCell).join(","));
+    });
+    return rows.join("\n");
+  }
+  if(fmt==="md"){
+    var md="# "+o.title+"\n\n_"+note+"_\n\n";
+    list.forEach(function(p,i){
+      var bullet=o.num?(i+1)+". ":"- ", pad=o.num?"   ":"  ";
+      md+=bullet+"["+mdEsc(p.t)+"]("+p.u+")";
+      if(o.meta) md+=" | "+BLOGS[p.b].name+", "+fmtDate(p.d);
+      md+="\n";
+      if(o.sum && p.s) md+=pad+p.s+"\n";
+      if(o.tags && p.g && p.g.length) md+=pad+"Tags: "+p.g.join(", ")+"\n";
+      if(o.also && p.a && p.a.length) md+=pad+"Also published at: "+p.a.map(function(u){return "<"+u+">";}).join(", ")+"\n";
+      md+="\n";
+    });
+    return md.trim()+"\n";
+  }
+  if(fmt==="txt"){
+    var t=o.title+"\n"+note+"\n\n";
+    list.forEach(function(p,i){
+      t+=(o.num?(i+1)+". ":"")+p.t+"\n";
+      if(o.meta) t+=BLOGS[p.b].name+", "+fmtDate(p.d)+"\n";
+      t+=p.u+"\n";
+      if(o.sum && p.s) t+=p.s+"\n";
+      if(o.tags && p.g && p.g.length) t+="Tags: "+p.g.join(", ")+"\n";
+      if(o.also && p.a && p.a.length) t+="Also published at: "+p.a.join(" ")+"\n";
+      t+="\n";
+    });
+    return t.trim()+"\n";
+  }
+  var tag=o.num?"ol":"ul", h='<h2>'+esc(o.title)+'</h2>\n<p><em>'+esc(note)+'</em></p>\n<'+tag+'>\n';
+  list.forEach(function(p){
+    h+='<li><a href="'+esc(p.u)+'">'+esc(p.t)+'</a>';
+    if(o.meta) h+=' <span style="color:#000000">('+esc(BLOGS[p.b].name)+', '+fmtDate(p.d)+')</span>';
+    if(o.sum && p.s) h+='<p>'+esc(p.s)+'</p>';
+    if(o.tags && p.g && p.g.length) h+='<p style="color:#000000;font-size:90%">Tags: '+esc(p.g.join(", "))+'</p>';
+    if(o.also && p.a && p.a.length) h+='<p style="color:#000000;font-size:90%">Also published at: '+p.a.map(function(u){return '<a href="'+esc(u)+'">'+esc(u)+'</a>';}).join(", ")+'</p>';
+    h+='</li>\n';
+  });
+  return h+'</'+tag+'>\n';
+}
+function renderExport(){
+  var has=selected.length>0;
+  $("copy").disabled=!has; $("download").disabled=!has;
+  var out=buildExport(FMT);
+  if(FMT==="html"){ $("preview-html").hidden=false; $("preview-text").hidden=true; $("preview-html").innerHTML = has? out.replace(/<a /g,'<a target="_blank" rel="noopener" ') : '<p style="color:var(--ink-3)">Your export will appear here.</p>'; }
+  else { $("preview-html").hidden=true; $("preview-text").hidden=false; $("preview-text").value = has? out : ""; }
+}
+function flash(id,msg){ var el=$(id); el.textContent=msg; clearTimeout(el._t); el._t=setTimeout(function(){el.textContent="";},3500); }
+function copyExport(){
+  var out=buildExport(FMT);
+  if(FMT==="html"){
+    var plain=buildExport("txt");
+    if(window.ClipboardItem && navigator.clipboard && navigator.clipboard.write){
+      navigator.clipboard.write([new ClipboardItem({"text/html":new Blob([out],{type:"text/html"}),"text/plain":new Blob([plain],{type:"text/plain"})})])
+        .then(function(){flash("export-status","Copied with working links. Paste it into an email or document.");}, function(){ selectRendered(); });
+    } else selectRendered();
+    return;
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(out).then(function(){flash("export-status","Copied.");}, function(){ var ta=$("preview-text"); ta.focus(); ta.select(); flash("export-status","Press Ctrl+C or Cmd+C to copy the selected text."); });
+  } else { var ta=$("preview-text"); ta.focus(); ta.select(); flash("export-status","Press Ctrl+C or Cmd+C to copy the selected text."); }
+}
+function selectRendered(){
+  var r=document.createRange(); r.selectNodeContents($("preview-html")); var s=window.getSelection(); s.removeAllRanges(); s.addRange(r);
+  flash("export-status","Press Ctrl+C or Cmd+C to copy the selected list.");
+}
+function downloadExport(){
+  var map={html:["html","text/html"],md:["md","text/markdown"],txt:["txt","text/plain"],csv:["csv","text/csv"]}[FMT];
+  var body=buildExport(FMT);
+  if(FMT==="html") body='<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><title>'+esc(opts().title)+'</title></head>\n<body style="font-family:Arial,Helvetica,sans-serif;max-width:760px;margin:2em auto;padding:0 1em;line-height:1.5">\n'+body+'</body></html>\n';
+  var name=(opts().title.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"reading-list")+"."+map[0];
+  try{
+    var url=URL.createObjectURL(new Blob([body],{type:map[1]+";charset=utf-8"}));
+    var a=document.createElement("a"); a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){URL.revokeObjectURL(url);},2000);
+    flash("export-status","Downloading "+name+". If nothing downloads, use Copy instead.");
+  }catch(e){ flash("export-status","This browser blocked the download. Use Copy instead."); }
+}
+
+/* ---------- Tabs ---------- */
+var TABS=["search","selected","browse","about"];
+function showTab(name, focus){
+  if(TABS.indexOf(name)<0) name="search";
+  TABS.forEach(function(t){
+    var on=t===name, tab=$("tab-"+t);
+    tab.setAttribute("aria-selected",on); tab.tabIndex=on?0:-1;
+    $("panel-"+t).hidden=!on;
+  });
+  document.body.classList.toggle("wide", name==="search");
+  if(name==="selected") renderSelected();
+  if(focus) $("tab-"+name).focus();
+  try{ history.replaceState(null,"","#"+name); }catch(e){}
+}
+
+/* ---------- Header, About ---------- */
+function renderHeader(){
+  var first=POSTS.reduce(function(m,p){return p.d<m?p.d:m;},"9999"), last=POSTS.reduce(function(m,p){return p.d>m?p.d:m;},"0");
+  var words=POSTS.reduce(function(a,p){return a+(p.w||0);},0);
+  document.title = DATA.title || CONFIG.title;
+  $("app-title").textContent = DATA.title || CONFIG.title;
+  $("app-subtitle").textContent = DATA.subtitle || ("Every post from "+CONFIG.author+"'s "+BLOGS.length+" blogs, "+first.slice(0,4)+" to "+last.slice(0,4)+".");
+  $("stats").innerHTML =
+    '<div class="stat"><b>'+fmtNum(POSTS.length)+'</b><span>Posts</span></div>'+
+    '<div class="stat"><b>'+BLOGS.length+'</b><span>Blogs</span></div>'+
+    '<div class="stat"><b>'+(words/1e6).toFixed(1)+'M</b><span>Words</span></div>'+
+    '<div class="stat"><b>'+first.slice(0,4)+'&ndash;'+last.slice(0,4)+'</b><span>Years</span></div>';
+  $("about-intro").textContent = "This library holds "+fmtNum(POSTS.length)+" posts written by "+CONFIG.author+" across "+BLOGS.length+" blogs. When an article was published on more than one blog, it appears once here, as its most recent copy, with links to the other copies. Data last updated "+(DATA.generated||"unknown")+".";
+  $("about-table").innerHTML = '<thead><tr><th>Blog</th><th class="num">Posts</th><th>First post</th><th>Latest post</th></tr></thead><tbody>'+
+    BLOGS.map(function(b){return '<tr><td>'+esc(b.name)+'</td><td class="num">'+fmtNum(b.count)+'</td><td>'+fmtDate(b.first)+'</td><td>'+fmtDate(b.last)+'</td></tr>';}).join("")+'</tbody>';
+  $("footer-text").textContent = (DATA.title||CONFIG.title)+" \u00b7 "+fmtNum(POSTS.length)+" posts \u00b7 Links open the original post on its blog.";
+}
+
+/* ---------- Events ---------- */
+function bind(){
+  $("search-form").addEventListener("submit",function(e){ e.preventDefault(); S.q=$("q").value.trim(); if(S.q && S.sort!=="relevance" && !bind._userSort) S.sort="relevance"; syncFilterInputs(); update(); });
+  var qt; $("q").addEventListener("input",function(){ clearTimeout(qt); qt=setTimeout(function(){ S.q=$("q").value.trim(); update(); },250); });
+  $("blog-filter").addEventListener("change",function(){ readBlogChecks(); update(); });
+  $("blogs-all").addEventListener("click",function(){ S.blogs=null; syncFilterInputs(); update(); });
+  $("blogs-none").addEventListener("click",function(){ S.blogs=new Set(); syncFilterInputs(); update(); });
+  $("year-from").addEventListener("change",function(){ S.from=+this.value; if(S.from>S.to){S.to=S.from;} syncFilterInputs(); update(); });
+  $("year-to").addEventListener("change",function(){ S.to=+this.value; if(S.to<S.from){S.from=S.to;} syncFilterInputs(); update(); });
+  $("tag").addEventListener("change",function(){ S.tag=this.value.trim(); update(); });
+  $("sort").addEventListener("change",function(){ S.sort=this.value; bind._userSort=true; update(); });
+  $("page-size").addEventListener("change",function(){ S.size=+this.value; update(); });
+  $("reset").addEventListener("click",function(){ S.q="";S.blogs=null;S.from=minYear;S.to=maxYear;S.tag="";S.sort="relevance"; syncFilterInputs(); update(); });
+  $("active-filters").addEventListener("click",function(e){
+    var k=e.target.getAttribute("data-clear"); if(!k) return;
+    if(k==="q") S.q=""; if(k==="blogs") S.blogs=null; if(k==="years"){S.from=minYear;S.to=maxYear;} if(k==="tag") S.tag="";
+    syncFilterInputs(); update();
+  });
+  $("results").addEventListener("change",function(e){
+    var u=e.target.getAttribute("data-url"); if(!u) return;
+    toggleSel(u,e.target.checked); e.target.closest(".result").classList.toggle("is-selected",e.target.checked); updatePageBtn();
+  });
+  document.addEventListener("click",function(e){
+    var t=e.target.closest("[data-tag]");
+    if(t){ S.tag=t.getAttribute("data-tag"); S.q=""; S.blogs=null; S.from=minYear; S.to=maxYear; syncFilterInputs(); update(); showTab("search"); window.scrollTo(0,0); return; }
+    var g=e.target.closest("[data-goblog]");
+    if(g){ S.blogs=new Set([+g.getAttribute("data-goblog")]); S.q=""; S.tag=""; S.from=minYear; S.to=maxYear; S.sort="newest"; syncFilterInputs(); update(); showTab("search"); window.scrollTo(0,0); return; }
+    var y=e.target.closest("[data-goyear]");
+    if(y){ var yr=+y.getAttribute("data-goyear"); S.from=yr; S.to=yr; S.q=""; S.tag=""; S.blogs=null; S.sort="oldest"; syncFilterInputs(); update(); showTab("search"); window.scrollTo(0,0); return; }
+  });
+  $("pager").addEventListener("click",function(e){ var b=e.target.closest("[data-page]"); if(!b||b.disabled) return; S.page=+b.getAttribute("data-page"); renderResults(); $("result-summary").scrollIntoView({block:"start"}); });
+  $("sel-page").addEventListener("click",function(){
+    var start=(S.page-1)*S.size, pg=lastResults.slice(start,start+S.size);
+    if(pageAllSelected()) pg.forEach(function(p){ var i=selected.indexOf(p.u); if(i>-1) selected.splice(i,1); });
+    else pg.forEach(function(p){ if(selected.indexOf(p.u)<0) selected.push(p.u); });
+    save(); updateSelCount(); renderResults();
+  });
+  $("sel-all").addEventListener("click",function(){
+    lastResults.forEach(function(p){ if(selected.indexOf(p.u)<0) selected.push(p.u); });
+    save(); updateSelCount(); renderResults();
+  });
+  $("sel-list").addEventListener("click",function(e){ var u=e.target.getAttribute("data-unsel"); if(!u) return; toggleSel(u,false); renderSelected(); renderResults(); });
+  var clearArmed=false;
+  $("sel-clear").addEventListener("click",function(){
+    if(!selected.length) return;
+    if(!clearArmed){ clearArmed=true; this.textContent="Click again to clear"; var btn=this; setTimeout(function(){clearArmed=false;btn.textContent="Clear all";},3000); return; }
+    clearArmed=false; this.textContent="Clear all"; selected=[]; save(); updateSelCount(); renderSelected(); renderResults();
+  });
+  $("fmt").addEventListener("click",function(e){ var b=e.target.closest("[data-fmt]"); if(!b) return; FMT=b.getAttribute("data-fmt"); Array.prototype.forEach.call(this.children,function(c){c.setAttribute("aria-pressed",c===b);}); renderExport(); });
+  ["opt-summary","opt-meta","opt-tags","opt-also","opt-num","opt-order"].forEach(function(id){ $(id).addEventListener("change",renderExport); });
+  $("list-title").addEventListener("input",renderExport);
+  $("copy").addEventListener("click",copyExport);
+  $("download").addEventListener("click",downloadExport);
+  TABS.forEach(function(t,i){
+    $("tab-"+t).addEventListener("click",function(){ showTab(t); });
+    $("tab-"+t).addEventListener("keydown",function(e){
+      if(e.key==="ArrowRight"||e.key==="ArrowLeft"){ e.preventDefault(); showTab(TABS[(i+(e.key==="ArrowRight"?1:TABS.length-1))%TABS.length],true); }
+    });
+  });
+}
+
+function init(){
+  buildFilters(); renderHeader(); renderBrowse(); updateSelCount(); renderResults(); renderSelected();
+}
+
+/* ---------- Start ---------- */
+try{
+  loadData(JSON.parse($("library-data").textContent));
+}catch(e){
+  loadData({blogs:[],posts:[]});
+  $("results").innerHTML='<div class="empty-state">The library data could not be read.</div>';
+}
+restore(); bind(); init();
+try{ if(window.matchMedia("(max-width:860px)").matches) $("filters-details").open=false; }catch(e){}
+showTab((location.hash||"#search").slice(1));
+})();
+</script>
+
+</body>
+</html>
