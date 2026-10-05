@@ -222,6 +222,7 @@ footer{border-top:1px solid var(--line);padding-block:18px;color:var(--ink-3);fo
     <button class="tab" role="tab" id="tab-search" aria-controls="panel-search" aria-selected="true">Search</button>
     <button class="tab" role="tab" id="tab-selected" aria-controls="panel-selected" aria-selected="false" tabindex="-1">Selected &amp; Export <span class="count-pill" id="sel-count">0</span></button>
     <button class="tab" role="tab" id="tab-browse" aria-controls="panel-browse" aria-selected="false" tabindex="-1">Browse</button>
+    <button class="tab" role="tab" id="tab-ages" aria-controls="panel-ages" aria-selected="false" tabindex="-1">Age Ranges</button>
     <button class="tab" role="tab" id="tab-about" aria-controls="panel-about" aria-selected="false" tabindex="-1">About</button>
   </div>
 </nav>
@@ -376,6 +377,37 @@ footer{border-top:1px solid var(--line);padding-block:18px;color:var(--ink-3);fo
         </div>
         <p class="hint" style="margin-top:8px">Summaries are the opening sentences of each post, in the author's own words.</p>
       </div>
+    </div>
+  </section>
+
+  <!-- AGE RANGES -->
+  <section class="panel" id="panel-ages" role="tabpanel" aria-labelledby="tab-ages" hidden>
+    <div class="prose">
+      <h2>Age ranges for youth groups</h2>
+      <p>Every post has a suggested age range for reading and discussing it in a youth group with an adult leader.</p>
+
+      <h3>Using the age ranges</h3>
+      <ul>
+        <li><strong>Filter.</strong> On the Search tab, choose the age of the youngest person in your group under <strong>Youth group age</strong>, for example "Youngest is 12 or 13". Only posts suitable for that age are shown, and they are selected for export automatically.</li>
+        <li><strong>Labels.</strong> Each post shows a badge: <span class="agebadge">All ages</span>, <span class="agebadge">Ages 12+</span>, <span class="agebadge">Ages 14+</span> or <span class="agebadge">Ages 16+</span>. When a post deals with hard subjects, a line under its summary names them, for example "Mature themes: deaths of children", and its badge is orange: <span class="agebadge mature">Ages 14+</span>.</li>
+        <li><strong>Export.</strong> In Selected &amp; Export, tick <strong>Age range</strong> to add each post's range and any mature themes to the exported list.</li>
+      </ul>
+
+      <h3>How the age is set</h3>
+      <p>Each post gets the higher of two measures:</p>
+      <ul>
+        <li><strong>Reading level.</strong> The age at which a group with an adult leader could follow the post, based on sentence length and word difficulty. Reading level alone never raises a post above 14+.</li>
+        <li><strong>Mature themes.</strong> Suicide or self-harm, sexual violence, graphic violence, genocide and war, the deaths of children, police violence, drugs, and strong language. A passing mention raises the age a little; a post centered on the subject raises it more. Figures of speech such as "the rape of the Earth" or "suicide bombing" are not counted as sexual violence or self-harm.</li>
+      </ul>
+
+      <h3>The library by age range</h3>
+      <div class="tbl-wrap"><table id="age-table"></table></div>
+
+      <h3>How the ranges were checked</h3>
+      <p>A separate reviewer read 30 sample posts and judged them without seeing the computer's answers. The first rules rated too many harmless posts 16+ and missed some descriptions of children's deaths in Gaza, so the rules were changed. After the changes, every one of the 30 posts was within one age band of the reviewer's judgment, and half matched exactly.</p>
+
+      <h3>Please read before sharing</h3>
+      <p>These ranges are guidance worked out by a computer, not an official rating. Please read a post before sharing it with young people. New posts are rated the same way when they are added each day.</p>
     </div>
   </section>
 
@@ -754,7 +786,7 @@ function downloadExport(){
 }
 
 /* ---------- Tabs ---------- */
-var TABS=["search","selected","browse","about"];
+var TABS=["search","selected","browse","ages","about"];
 function showTab(name, focus){
   if(TABS.indexOf(name)<0) name="search";
   TABS.forEach(function(t){
@@ -848,8 +880,14 @@ function bind(){
   });
 }
 
+function renderAges(){
+  var bands=[[0,"All ages"],[12,"12+"],[14,"14+"],[16,"16+"],[18,"18+"],[-1,"Not rated (mostly photos or video)"]], n={};
+  POSTS.forEach(function(p){ var a=(p.ag==null)?-1:p.ag; n[a]=(n[a]||0)+1; });
+  $("age-table").innerHTML='<thead><tr><th>Range</th><th class="num">Posts</th></tr></thead><tbody>'+
+    bands.filter(function(b){return n[b[0]];}).map(function(b){return '<tr><td>'+b[1]+'</td><td class="num">'+fmtNum(n[b[0]])+'</td></tr>';}).join("")+'</tbody>';
+}
 function init(){
-  buildFilters(); renderHeader(); renderBrowse(); updateSelCount(); renderResults(); renderSelected();
+  buildFilters(); renderHeader(); renderBrowse(); renderAges(); updateSelCount(); renderResults(); renderSelected();
   lastSearchKey=searchKey();
 }
 
