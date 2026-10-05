@@ -24,6 +24,8 @@ import sys
 import time
 import urllib.error
 import urllib.request
+import xml.etree.ElementTree as ET
+from email.utils import parsedate_to_datetime
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 
@@ -103,6 +105,27 @@ def fetch_wordpress(sid, site):
 
 
 def fetch_substack(sid):
+    """Returns (posts, complete). Substack often refuses requests from cloud
+    servers such as GitHub's, so this falls back to the blog's RSS feed, which
+    lists only the most recent posts (complete=False)."""
+    try:
+        return fetch_substack_api(sid), True
+    except Exception as e:
+        print(f"Active Objection: full list unavailable ({e}); using the RSS feed.", flush=True)
+    req = urllib.request.Request("https://activeobjection.substack.com/feed", headers=UA)
+    with urllib.request.urlopen(req, timeout=90) as r:
+        root = ET.fromstring(r.read())
+    ns = {"content": "http://purl.org/rss/1.0/modules/content/"}
+    out = []
+    for it in root.iter("item"):
+        out.append({"s": sid, "t": it.findtext("title") or "", "u": it.findtext("link"),
+                    "published": parsedate_to_datetime(it.findtext("pubDate")).astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                    "html": it.findtext("content:encoded", default="", namespaces=ns),
+                    "terms": [c.text for c in it.findall("category") if c.text], "sub": it.findtext("description") or ""})
+    return out, False
+
+
+def fetch_substack_api(sid):
     arch, off = [], 0
     while True:
         a, _ = get(f"https://activeobjection.substack.com/api/v1/archive?sort=new&offset={off}&limit=50")
@@ -184,18 +207,25 @@ def first_sentence(text, limit=220):
 
 
 # ------------------------------------------------------------------ build
-def current_count():
+def current_data():
     if not os.path.exists(OUTPUT):
-        return 0
+        return {"blogs": [], "posts": []}
     m = re.search(r'id="library-data">(.*?)</script>', open(OUTPUT, encoding="utf-8").read(), re.S)
-    return len(json.loads(m.group(1).replace("<\\/", "</"))["posts"]) if m else 0
+    return json.loads(m.group(1).replace("<\\/", "</")) if m else {"blogs": [], "posts": []}
 
 
 def main():
-    raw = []
+    current = current_data()
+    old = len(current["posts"])
+    raw, partial = [], set()
     for sid, (name, slug, src) in BLOGS.items():
         try:
-            got = fetch_substack(sid) if src == "substack" else fetch_wordpress(sid, src)
+            if src == "substack":
+                got, complete = fetch_substack(sid)
+                if not complete:
+                    partial.add(sid)
+            else:
+                got = fetch_wordpress(sid, src)
         except Exception as e:
             sys.exit(f"Stopped: could not read {name} ({e}). The desk was not changed.")
         if not got:
@@ -216,13 +246,25 @@ def main():
                       "sub": html.unescape(p["sub"]).strip(), "u": p["u"], "d": p["published"][:10],
                       "x": html_to_text(p["html"]), "html": p["html"], "tags": tags})
 
+    # A blog read only through its feed: keep the posts already in the desk as
+    # they are, and add only feed posts the desk does not have yet.
+    carried = []
+    if partial:
+        names = [b["name"] for b in current["blogs"]]
+        for e in current["posts"]:
+            sid = next((s for s in partial if names[e["b"]] == BLOGS[s][0]), None)
+            if sid:
+                carried.append((sid, e))
+        known = {e["u"] for _, e in carried} | {u for _, e in carried for u in e.get("a", [])}
+        posts = [p for p in posts if not (p["s"] in partial and p["u"] in known)]
+        print(f"Kept {len(carried)} posts already in the desk from blogs read through their feed.")
+
     hidden, also = find_duplicates(posts)
     hidden = set(hidden)
     keep = [p for p in posts if p["u"] not in hidden]
 
-    old = current_count()
-    if old and len(keep) < old * (1 - MAX_DROP):
-        sys.exit(f"Stopped: found {len(keep)} posts but the desk has {old}. "
+    if old and len(keep) + len(carried) < old * (1 - MAX_DROP):
+        sys.exit(f"Stopped: found {len(keep) + len(carried)} posts but the desk has {old}. "
                  "One of the blogs may be having trouble. The desk was not changed.")
 
     order = sorted(BLOGS, key=lambda sid: BLOGS[sid][0].lower())
@@ -235,6 +277,15 @@ def main():
         entries.append({"t": p["t"], "d": p["d"], "b": bidx[p["s"]], "u": p["u"], "g": p["tags"],
                         "s": summarize(text, fallback), "w": len(text.split()),
                         "a": [u for _, _, u in also.get(p["u"], [])], "x": " ".join(sorted(words))})
+    if partial:
+        # Keep links to copies on a feed-only blog that this run could not compare.
+        prev = {e["u"]: e for e in current["posts"]}
+        for e in entries:
+            for u in prev.get(e["u"], {}).get("a", []):
+                if u not in e["a"] and "substack.com" in u:
+                    e["a"].append(u)
+    for sid, e in carried:
+        entries.append(dict(e, b=bidx[sid]))
     entries.sort(key=lambda e: (e["d"], e["u"]), reverse=True)
 
     blogs = []
@@ -256,7 +307,7 @@ def main():
             return
     with open(OUTPUT, "w", encoding="utf-8", newline="\n") as f:
         f.write(page)
-    print(f"Wrote desk/index.html: {len(entries)} posts (was {old}), {len(hidden)} copies left out.")
+    print(f"Wrote desk/index.html: {len(entries)} posts (was {old}), {sum(len(e["a"]) for e in entries)} copies linked.")
 
 
 if __name__ == "__main__":
