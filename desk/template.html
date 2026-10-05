@@ -122,6 +122,10 @@ main{padding-block:24px 56px}
 .tags{grid-column:2;display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
 .tagbtn{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:1px 9px;font-size:.76rem;color:var(--ink-2);cursor:pointer}
 .tagbtn:hover{border-color:var(--accent);color:var(--accent)}
+.agebadge{display:inline-block;padding:0 8px;border-radius:999px;background:#e6eef6;border:1px solid #bfd1e2;color:#000;font-weight:600;font-size:.76rem}
+.agebadge.mature{background:#fbe7d3;border-color:#ecc39c}
+.agebadge.none{background:var(--mist);border-color:var(--line)}
+.themes{grid-column:2;font-size:.82rem;color:var(--ink);margin-top:6px}
 .also{grid-column:2;font-size:.8rem;color:var(--ink-3);margin-top:6px}
 mark{background:var(--mark);color:inherit;border-radius:2px;padding:0 1px}
 .empty-state{background:var(--card);border:1px dashed var(--line);border-radius:var(--r);padding:28px;text-align:center;color:var(--ink-2)}
@@ -244,6 +248,16 @@ footer{border-top:1px solid var(--line);padding-block:18px;color:var(--ink-3);fo
           </div>
         </div>
         <div class="field">
+          <label class="label" for="age">Youth group age</label>
+          <select class="select" id="age">
+            <option value="">Any age</option>
+            <option value="10">Youngest is 10 or 11</option>
+            <option value="12">Youngest is 12 or 13</option>
+            <option value="14">Youngest is 14 or 15</option>
+            <option value="16">Youngest is 16 or 17</option>
+          </select>
+        </div>
+        <div class="field">
           <label class="label" for="tag">Tag</label>
           <input class="input" id="tag" list="tag-options" placeholder="Any tag">
           <datalist id="tag-options"></datalist>
@@ -334,6 +348,7 @@ footer{border-top:1px solid var(--line);padding-block:18px;color:var(--ink-3);fo
               <label class="check"><input type="checkbox" id="opt-meta" checked> Blog and date</label>
               <label class="check"><input type="checkbox" id="opt-tags"> Tags</label>
               <label class="check"><input type="checkbox" id="opt-also"> Other copies</label>
+              <label class="check"><input type="checkbox" id="opt-age"> Age range</label>
               <label class="check"><input type="checkbox" id="opt-num" checked> Numbered list</label>
             </div>
           </div>
@@ -377,6 +392,14 @@ footer{border-top:1px solid var(--line);padding-block:18px;color:var(--ink-3);fo
         <li>Put a minus sign before a word, such as <code>-Iowa</code>, to leave out posts that use it.</li>
         <li>Best match ranks title matches first, then tags, then summaries, then the rest of the text.</li>
       </ul>
+      <h3>Age ranges for youth groups</h3>
+      <p>Each post has a suggested minimum age for reading and discussing it in a youth group with an adult leader: All ages, 12+, 14+ or 16+. It is guidance worked out by a computer, not an official rating, so please read a post before sharing it with young people.</p>
+      <ul>
+        <li><strong>Reading level.</strong> Longer sentences and longer words raise the age, up to 14+.</li>
+        <li><strong>Mature themes.</strong> Posts about suicide or self-harm, sexual violence, graphic violence, genocide and war, the deaths of children, police violence, drugs, or strong language get a higher age. A passing mention raises it a little; a post centered on the subject raises it more. The themes found are listed under the post.</li>
+        <li>Posts that are mostly photos or video have too little text to rate and say "Age not rated".</li>
+      </ul>
+      <p>To find posts for your group, choose the age of its youngest member under Youth group age on the Search tab.</p>
       <h3>Exporting</h3>
       <p>When you search or set filters, every article found is selected. Untick any you want to leave out, or use Deselect page. In the Selected &amp; Export tab, choose a format and whether to include a summary of each article, then copy the list or download it. Rich text pastes into email and word processors with working links. Your selection is kept in this browser until you clear it.</p>
     </div>
@@ -427,7 +450,7 @@ function save(){ try{ localStorage.setItem(CONFIG.storageKey, JSON.stringify({se
 function restore(){ try{ var s=JSON.parse(localStorage.getItem(CONFIG.storageKey)||"{}"); if(Array.isArray(s.sel)) selected=s.sel.filter(function(u){return BYURL[u];}); }catch(e){} }
 
 /* ---------- Search state ---------- */
-var S = { q:"", blogs:null, from:0, to:9999, tag:"", sort:"relevance", page:1, size:25 };
+var S = { q:"", blogs:null, from:0, to:9999, tag:"", age:"", sort:"relevance", page:1, size:25 };
 var lastResults = [];
 
 function parseQuery(q){
@@ -456,6 +479,7 @@ function runSearch(){
     if(S.blogs && !S.blogs.has(p.b)) continue;
     if(p.y<S.from || p.y>S.to) continue;
     if(tag && !(p.g||[]).some(function(g){return norm(g)===tag;})) continue;
+    if(S.age!=="" && !(p.ag>=0 && p.ag<=+S.age)) continue;
     var score=0, ok=true;
     for(var j=0;j<pos.length;j++){ var sc=termScore(p,pos[j]); if(!sc){ok=false;break;} score+=sc; }
     if(!ok) continue;
@@ -502,8 +526,9 @@ function renderResults(){
       +'<div class="pick"><input type="checkbox" data-url="'+esc(p.u)+'" aria-label="Select '+esc(p.t)+'"'+(isSel?' checked':'')+'></div>'
       +'<div style="min-width:0"><h3><a href="'+esc(p.u)+'" target="_blank" rel="noopener">'+highlight(p.t,pos)+'</a></h3>'
       +'<div class="meta"><span class="blog-tag"><span class="dot" style="background:'+b.color+'"></span>'+esc(b.name)+'</span>'
-      +'<span>'+fmtDate(p.d)+'</span><span>'+fmtNum(p.w)+' words &middot; '+Math.max(1,Math.round(p.w/230))+' min read</span></div></div>'
+      +'<span>'+fmtDate(p.d)+'</span><span>'+fmtNum(p.w)+' words &middot; '+Math.max(1,Math.round(p.w/230))+' min read</span>'+ageBadge(p)+'</div></div>'
       +(p.s?'<p class="sum">'+highlight(p.s,pos)+'</p>':'<p class="sum empty">No summary text. This post is mostly images or embedded media.</p>')
+      +((p.th&&p.th.length)?'<div class="themes">Mature themes: '+esc(p.th.join(", "))+'</div>':'')
       +((p.g&&p.g.length)?'<div class="tags">'+p.g.slice(0,10).map(function(g){return '<button type="button" class="tagbtn" data-tag="'+esc(g)+'">'+esc(g)+'</button>';}).join("")+'</div>':'')
       +((p.a&&p.a.length)?'<div class="also">Also published at '+p.a.map(function(u){return '<a href="'+esc(u)+'" target="_blank" rel="noopener">'+esc(u.replace(/^https?:\/\//,"").split("/")[0])+'</a>';}).join(", ")+'</div>':'')
       +'</article>';
@@ -518,6 +543,12 @@ function pageAllSelected(){
   return pg.length>0 && pg.every(function(p){return selected.indexOf(p.u)>-1;});
 }
 function updatePageBtn(){ $("sel-page").textContent = pageAllSelected() ? "Deselect page" : "Select page"; }
+function ageLabel(p){ return p.ag==null||p.ag<0 ? "Age not rated" : p.ag===0 ? "All ages" : "Ages "+p.ag+"+"; }
+function ageBadge(p){
+  var cls = (p.ag==null||p.ag<0) ? " none" : (p.th&&p.th.length ? " mature" : "");
+  var tip = (p.ag==null||p.ag<0) ? "Too little text to rate. Check the post itself." : "Suggested minimum age for a youth group with an adult leader.";
+  return '<span class="agebadge'+cls+'" title="'+tip+'">'+ageLabel(p)+'</span>';
+}
 function renderPager(pages){
   if(pages<=1){ $("pager").innerHTML=""; return; }
   var cur=S.page, h='<button class="btn" type="button" data-page="'+(cur-1)+'"'+(cur===1?' disabled':'')+'>Previous</button>';
@@ -538,6 +569,7 @@ function renderActiveFilters(){
   if(S.blogs && S.blogs.size<BLOGS.length) chips.push(["blogs", S.blogs.size+" of "+BLOGS.length+" blogs"]);
   if(S.from>minYear || S.to<maxYear) chips.push(["years", S.from===S.to? "Year "+S.from : S.from+" to "+S.to]);
   if(S.tag) chips.push(["tag","Tag: "+S.tag]);
+  if(S.age!=="") chips.push(["age","Suitable for ages "+S.age+(S.age==="16"?" and up":" and up")]);
   $("active-filters").innerHTML = chips.map(function(c){ return '<span class="chip">'+esc(c[1])+'<button type="button" data-clear="'+c[0]+'" aria-label="Remove filter">&times;</button></span>'; }).join("");
 }
 
@@ -559,7 +591,7 @@ function buildFilters(){
 }
 function shortName(n){ return n.replace(/\s*\(.*\)\s*$/,""); }
 function syncFilterInputs(){
-  $("q").value=S.q; $("year-from").value=S.from; $("year-to").value=S.to; $("tag").value=S.tag; $("sort").value=S.sort; $("page-size").value=S.size;
+  $("q").value=S.q; $("year-from").value=S.from; $("year-to").value=S.to; $("tag").value=S.tag; $("age").value=S.age; $("sort").value=S.sort; $("page-size").value=S.size;
   Array.prototype.forEach.call(document.querySelectorAll("[data-blog]"),function(cb){ cb.checked = !S.blogs || S.blogs.has(+cb.dataset.blog); });
 }
 var _tagCounts=null;
@@ -577,8 +609,8 @@ function readBlogChecks(){
 function update(){ S.page=1; runSearch(); syncSelectionToSearch(); renderResults(); }
 /* The articles found by the search become the selection whenever the search changes. */
 var lastSearchKey="";
-function searchKey(){ return JSON.stringify([S.q, S.blogs?Array.from(S.blogs).sort():null, S.from, S.to, S.tag]); }
-function searchIsDefault(){ return !S.q && !S.blogs && S.from===minYear && S.to===maxYear && !S.tag; }
+function searchKey(){ return JSON.stringify([S.q, S.blogs?Array.from(S.blogs).sort():null, S.from, S.to, S.tag, S.age]); }
+function searchIsDefault(){ return !S.q && !S.blogs && S.from===minYear && S.to===maxYear && !S.tag && S.age===""; }
 function syncSelectionToSearch(){
   var key=searchKey(); if(key===lastSearchKey) return; lastSearchKey=key;
   selected = searchIsDefault() ? [] : lastResults.map(function(p){return p.u;});
@@ -625,7 +657,7 @@ function renderSelected(){
 
 /* ---------- Export ---------- */
 var FMT="html";
-function opts(){ return { sum:$("opt-summary").checked, meta:$("opt-meta").checked, tags:$("opt-tags").checked, also:$("opt-also").checked, num:$("opt-num").checked, title:$("list-title").value.trim()||"Reading list" }; }
+function opts(){ return { sum:$("opt-summary").checked, meta:$("opt-meta").checked, tags:$("opt-tags").checked, also:$("opt-also").checked, num:$("opt-num").checked, age:$("opt-age").checked, title:$("list-title").value.trim()||"Reading list" }; }
 function today(){ var d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
 function mdEsc(s){ return String(s).replace(/([\[\]])/g,"\\$1"); }
 function csvCell(s){ s=String(s==null?"":s); return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; }
@@ -633,10 +665,10 @@ function buildExport(fmt){
   var o=opts(), list=orderedSelection(), n=list.length;
   var note="Exported "+today()+" from "+CONFIG.title+". "+n+" "+(n===1?"article":"articles")+".";
   if(fmt==="csv"){
-    var head=["Title","URL"]; if(o.meta) head.push("Blog","Date"); if(o.tags) head.push("Tags"); if(o.sum) head.push("Summary"); if(o.also) head.push("Other copies");
+    var head=["Title","URL"]; if(o.meta) head.push("Blog","Date"); if(o.age) head.push("Age range","Mature themes"); if(o.tags) head.push("Tags"); if(o.sum) head.push("Summary"); if(o.also) head.push("Other copies");
     var rows=[head.join(",")];
     list.forEach(function(p){
-      var r=[p.t,p.u]; if(o.meta) r.push(BLOGS[p.b].name,p.d); if(o.tags) r.push((p.g||[]).join("; ")); if(o.sum) r.push(p.s||""); if(o.also) r.push((p.a||[]).join(" "));
+      var r=[p.t,p.u]; if(o.meta) r.push(BLOGS[p.b].name,p.d); if(o.age) r.push(ageLabel(p),(p.th||[]).join("; ")); if(o.tags) r.push((p.g||[]).join("; ")); if(o.sum) r.push(p.s||""); if(o.also) r.push((p.a||[]).join(" "));
       rows.push(r.map(csvCell).join(","));
     });
     return rows.join("\n");
@@ -647,6 +679,7 @@ function buildExport(fmt){
       var bullet=o.num?(i+1)+". ":"- ", pad=o.num?"   ":"  ";
       md+=bullet+"["+mdEsc(p.t)+"]("+p.u+")";
       if(o.meta) md+=" | "+BLOGS[p.b].name+", "+fmtDate(p.d);
+      if(o.age) md+=" | "+ageLabel(p)+(p.th&&p.th.length?" (mature themes: "+p.th.join(", ")+")":"");
       md+="\n";
       if(o.sum && p.s) md+=pad+p.s+"\n";
       if(o.tags && p.g && p.g.length) md+=pad+"Tags: "+p.g.join(", ")+"\n";
@@ -660,6 +693,7 @@ function buildExport(fmt){
     list.forEach(function(p,i){
       t+=(o.num?(i+1)+". ":"")+p.t+"\n";
       if(o.meta) t+=BLOGS[p.b].name+", "+fmtDate(p.d)+"\n";
+      if(o.age) t+=ageLabel(p)+(p.th&&p.th.length?". Mature themes: "+p.th.join(", "):"")+"\n";
       t+=p.u+"\n";
       if(o.sum && p.s) t+=p.s+"\n";
       if(o.tags && p.g && p.g.length) t+="Tags: "+p.g.join(", ")+"\n";
@@ -672,6 +706,7 @@ function buildExport(fmt){
   list.forEach(function(p){
     h+='<li><a href="'+esc(p.u)+'">'+esc(p.t)+'</a>';
     if(o.meta) h+=' <span style="color:#000000">('+esc(BLOGS[p.b].name)+', '+fmtDate(p.d)+')</span>';
+    if(o.age) h+=' <strong>'+esc(ageLabel(p))+'</strong>'+(p.th&&p.th.length?' <span style="font-size:90%">(mature themes: '+esc(p.th.join(", "))+')</span>':'');
     if(o.sum && p.s) h+='<p>'+esc(p.s)+'</p>';
     if(o.tags && p.g && p.g.length) h+='<p style="color:#000000;font-size:90%">Tags: '+esc(p.g.join(", "))+'</p>';
     if(o.also && p.a && p.a.length) h+='<p style="color:#000000;font-size:90%">Also published at: '+p.a.map(function(u){return '<a href="'+esc(u)+'">'+esc(u)+'</a>';}).join(", ")+'</p>';
@@ -761,12 +796,13 @@ function bind(){
   $("year-from").addEventListener("change",function(){ S.from=+this.value; if(S.from>S.to){S.to=S.from;} syncFilterInputs(); update(); });
   $("year-to").addEventListener("change",function(){ S.to=+this.value; if(S.to<S.from){S.from=S.to;} syncFilterInputs(); update(); });
   $("tag").addEventListener("change",function(){ S.tag=this.value.trim(); update(); });
+  $("age").addEventListener("change",function(){ S.age=this.value; update(); });
   $("sort").addEventListener("change",function(){ S.sort=this.value; bind._userSort=true; update(); });
   $("page-size").addEventListener("change",function(){ S.size=+this.value; update(); });
-  $("reset").addEventListener("click",function(){ S.q="";S.blogs=null;S.from=minYear;S.to=maxYear;S.tag="";S.sort="relevance"; syncFilterInputs(); update(); });
+  $("reset").addEventListener("click",function(){ S.q="";S.blogs=null;S.from=minYear;S.to=maxYear;S.tag="";S.age="";S.sort="relevance"; syncFilterInputs(); update(); });
   $("active-filters").addEventListener("click",function(e){
     var k=e.target.getAttribute("data-clear"); if(!k) return;
-    if(k==="q") S.q=""; if(k==="blogs") S.blogs=null; if(k==="years"){S.from=minYear;S.to=maxYear;} if(k==="tag") S.tag="";
+    if(k==="q") S.q=""; if(k==="blogs") S.blogs=null; if(k==="years"){S.from=minYear;S.to=maxYear;} if(k==="tag") S.tag=""; if(k==="age") S.age="";
     syncFilterInputs(); update();
   });
   $("results").addEventListener("change",function(e){
@@ -800,7 +836,7 @@ function bind(){
     clearArmed=false; this.textContent="Clear all"; selected=[]; save(); updateSelCount(); renderSelected(); renderResults();
   });
   $("fmt").addEventListener("click",function(e){ var b=e.target.closest("[data-fmt]"); if(!b) return; FMT=b.getAttribute("data-fmt"); Array.prototype.forEach.call(this.children,function(c){c.setAttribute("aria-pressed",c===b);}); renderExport(); });
-  ["opt-summary","opt-meta","opt-tags","opt-also","opt-num","opt-order"].forEach(function(id){ $(id).addEventListener("change",renderExport); });
+  ["opt-summary","opt-meta","opt-tags","opt-also","opt-num","opt-age","opt-order"].forEach(function(id){ $(id).addEventListener("change",renderExport); });
   $("list-title").addEventListener("input",renderExport);
   $("copy").addEventListener("click",copyExport);
   $("download").addEventListener("click",downloadExport);

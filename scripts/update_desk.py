@@ -30,6 +30,9 @@ from datetime import datetime, timezone
 from bs4 import BeautifulSoup
 from markdownify import MarkdownConverter
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from age_rating import rate  # suggested youth-group age
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 DESK = os.path.join(ROOT, "desk")
@@ -201,7 +204,9 @@ def main():
         text = body_text(p["html"])
         words = set(w for w in re.findall(r"[a-z0-9][a-z0-9'’-]{2,}", text.lower()) if w not in STOP)
         title = html.unescape(p["t"]).strip() or "(untitled)"
+        age = rate(title, clean(to_markdown(p["html"])))
         fresh.append({"t": title, "d": p["published"][:10], "b": bi, "u": p["u"], "g": tags,
+                      "ag": age["ag"], "th": age["th"],
                       "s": summarize(text, clean(first_sentence(text))), "w": len(text.split()),
                       "a": list(previous.get(p["u"], {}).get("a", [])), "x": " ".join(sorted(words))})
 
