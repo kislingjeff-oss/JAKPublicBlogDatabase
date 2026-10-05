@@ -303,7 +303,7 @@ footer{border-top:1px solid var(--line);padding-block:18px;color:var(--ink-3);fo
   <!-- SELECTED & EXPORT -->
   <section class="panel" id="panel-selected" role="tabpanel" aria-labelledby="tab-selected" hidden>
     <h2>Selected articles</h2>
-    <p class="lede">Build a reading list, then copy it or download it. Every title in the export links to the original post.</p>
+    <p class="lede">The articles found by your search on the Search tab are selected here. Remove any you want to leave out, then copy or download the list. Every title in the export links to the original post.</p>
     <div class="export-grid">
       <div class="box">
         <div class="toolbar" style="padding-top:0">
@@ -378,7 +378,7 @@ footer{border-top:1px solid var(--line);padding-block:18px;color:var(--ink-3);fo
         <li>Best match ranks title matches first, then tags, then summaries, then the rest of the text.</li>
       </ul>
       <h3>Exporting</h3>
-      <p>Tick the box beside any result to add it to your selection. In the Selected &amp; Export tab, choose a format and whether to include a summary of each article, then copy the list or download it. Rich text pastes into email and word processors with working links. Your selection is kept in this browser until you clear it.</p>
+      <p>When you search or set filters, every article found is selected. Untick any you want to leave out, or use Deselect page. In the Selected &amp; Export tab, choose a format and whether to include a summary of each article, then copy the list or download it. Rich text pastes into email and word processors with working links. Your selection is kept in this browser until you clear it.</p>
     </div>
   </section>
 </main>
@@ -574,7 +574,16 @@ function readBlogChecks(){
   var s=new Set(); Array.prototype.forEach.call(document.querySelectorAll("[data-blog]"),function(cb){ if(cb.checked) s.add(+cb.dataset.blog); });
   S.blogs = s.size===BLOGS.length ? null : s;
 }
-function update(){ S.page=1; renderResults(); }
+function update(){ S.page=1; runSearch(); syncSelectionToSearch(); renderResults(); }
+/* The articles found by the search become the selection whenever the search changes. */
+var lastSearchKey="";
+function searchKey(){ return JSON.stringify([S.q, S.blogs?Array.from(S.blogs).sort():null, S.from, S.to, S.tag]); }
+function searchIsDefault(){ return !S.q && !S.blogs && S.from===minYear && S.to===maxYear && !S.tag; }
+function syncSelectionToSearch(){
+  var key=searchKey(); if(key===lastSearchKey) return; lastSearchKey=key;
+  selected = searchIsDefault() ? [] : lastResults.map(function(p){return p.u;});
+  save(); updateSelCount();
+}
 
 /* ---------- Browse ---------- */
 function renderBrowse(){
@@ -610,7 +619,7 @@ function renderSelected(){
     var b=BLOGS[p.b];
     return '<li><div style="min-width:0"><a href="'+esc(p.u)+'" target="_blank" rel="noopener">'+esc(p.t)+'</a><div class="meta"><span class="blog-tag"><span class="dot" style="background:'+b.color+'"></span>'+esc(shortName(b.name))+'</span><span>'+fmtDate(p.d)+'</span></div></div>'
       +'<button type="button" class="iconbtn" data-unsel="'+esc(p.u)+'" aria-label="Remove '+esc(p.t)+'">&times;</button></li>';
-  }).join("") : '<li style="display:block;color:var(--ink-3);padding:18px 6px">Tick the box beside any search result to add it here.</li>';
+  }).join("") : '<li style="display:block;color:var(--ink-3);padding:18px 6px">Search on the Search tab. The articles it finds will appear here.</li>';
   renderExport();
 }
 
@@ -805,6 +814,7 @@ function bind(){
 
 function init(){
   buildFilters(); renderHeader(); renderBrowse(); updateSelCount(); renderResults(); renderSelected();
+  lastSearchKey=searchKey();
 }
 
 /* ---------- Start ---------- */
