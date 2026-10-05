@@ -291,13 +291,8 @@ footer{border-top:1px solid var(--line);padding-block:18px;color:var(--ink-3);fo
   <!-- BROWSE -->
   <section class="panel" id="panel-browse" role="tabpanel" aria-labelledby="tab-browse" hidden>
     <h2>Browse the library</h2>
-    <p class="lede">Choose a blog, a year or a tag to see those posts in Search.</p>
+    <p class="lede">Choose a blog or a tag to see those posts in Search.</p>
     <div class="cards" id="blog-cards"></div>
-    <div class="section">
-      <h3 class="sh">Posts per year</h3>
-      <p class="hint" style="margin-bottom:10px">Each bar is split by blog. Select a year to list its posts.</p>
-      <div class="chart-wrap"><div class="years" id="year-chart"></div><div class="legend" id="legend"></div></div>
-    </div>
     <div class="section">
       <h3 class="sh">Most used tags</h3>
       <p class="hint" style="margin-bottom:10px">The number after each tag is how many posts use it.</p>
@@ -588,18 +583,6 @@ function renderBrowse(){
       +(b.about?'<p class="about">'+esc(b.about)+'</p>':'')
       +'<span class="big">'+fmtNum(b.count)+'</span><small>posts &middot; '+fmtDate(b.first)+' to '+fmtDate(b.last)+'</small></button>';
   }).join("");
-  var years={}, maxN=0;
-  POSTS.forEach(function(p){ years[p.y]=years[p.y]||BLOGS.map(function(){return 0;}); years[p.y][p.b]++; });
-  for(var y=minYear;y<=maxYear;y++){ var t=(years[y]||[]).reduce(function(a,b){return a+b;},0); if(t>maxN) maxN=t; }
-  var h="";
-  for(y=minYear;y<=maxYear;y++){
-    var arr=years[y]||[], tot=arr.reduce(function(a,b){return a+b;},0), pct=maxN?tot/maxN*82:0;
-    h+='<button type="button" class="yearcol" data-goyear="'+y+'" aria-label="'+y+': '+tot+' posts"><span class="v">'+fmtNum(tot)+'</span><span class="stack" style="height:'+pct.toFixed(1)+'%">'
-      +arr.map(function(n,i){ return n?'<span style="flex:'+n+' 1 0;background:'+BLOGS[i].color+'" title="'+esc(BLOGS[i].name)+': '+n+'"></span>':''; }).join("")
-      +'</span><span class="y">'+y+'</span></button>';
-  }
-  $("year-chart").innerHTML=h;
-  $("legend").innerHTML=BLOGS.map(function(b){return '<span><span class="dot" style="background:'+b.color+'"></span>'+esc(shortName(b.name))+'</span>';}).join("");
   $("tag-cloud").innerHTML=tagCounts().slice(0,60).map(function(t){ return '<button type="button" class="tagbtn" data-tag="'+esc(t[0])+'">'+esc(t[0])+'<small>'+t[1]+'</small></button>'; }).join("");
 }
 
