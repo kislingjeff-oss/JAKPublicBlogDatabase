@@ -15,7 +15,7 @@ sources:
     last_modified: 2020-06-02T00:00:00Z
   - id: catalog
     resource: https://kislingjeff-oss.github.io/JAKPublicBlogDatabase/
-    title: "Jeff Kisling — Complete Writings (searchable catalog)"
+    title: "Jeff Kisling's Journal (searchable catalog)"
     author: human:jkisling
 ---
 
@@ -34,4 +34,4 @@ Blog by Jeff Kisling at <https://firstnationfarmer.com>.[^blog]
 Every post is searchable in the [complete catalog](https://kislingjeff-oss.github.io/JAKPublicBlogDatabase/).[^catalog]
 
 [^blog]: First Nation-Farmer Unity
-[^catalog]: Jeff Kisling — Complete Writings
+[^catalog]: Jeff Kisling's Journal

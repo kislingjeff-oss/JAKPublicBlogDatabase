@@ -1,6 +1,6 @@
 ---
 type: Dataset
-title: "Jeff Kisling — Complete Writings"
+title: "Jeff Kisling's Journal"
 description: "Searchable database of every blog post Jeff Kisling has published since 2015, across eight blogs."
 resource: https://kislingjeff-oss.github.io/JAKPublicBlogDatabase/
 tags: [blog, writings, catalog]

@@ -15,7 +15,7 @@ sources:
     last_modified: 2026-07-16T00:00:00Z
   - id: catalog
     resource: https://kislingjeff-oss.github.io/JAKPublicBlogDatabase/
-    title: "Jeff Kisling — Complete Writings (searchable catalog)"
+    title: "Jeff Kisling's Journal (searchable catalog)"
     author: human:jkisling
 ---
 
@@ -49,4 +49,4 @@ Every post is searchable in the [complete catalog](https://kislingjeff-oss.githu
 * FCNL (3)
 
 [^blog]: Active Objection
-[^catalog]: Jeff Kisling — Complete Writings
+[^catalog]: Jeff Kisling's Journal

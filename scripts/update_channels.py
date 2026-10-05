@@ -210,7 +210,7 @@ def write_blog_records(summary):
             f"    last_modified: {last}T00:00:00Z",
             "  - id: catalog",
             "    resource: https://kislingjeff-oss.github.io/JAKPublicBlogDatabase/",
-            "    title: \"Jeff Kisling — Complete Writings (searchable catalog)\"",
+            "    title: \"Jeff Kisling's Journal (searchable catalog)\"",
             f"    author: {AUTHOR}",
             "---",
             "",
@@ -238,7 +238,7 @@ def write_blog_records(summary):
             body += [""]
         body += [
             f"[^blog]: {b['name']}",
-            "[^catalog]: Jeff Kisling — Complete Writings",
+            "[^catalog]: Jeff Kisling's Journal",
             "",
         ]
         write_if_changed(os.path.join(ROOT, "blogs", slug + ".md"), "\n".join(fm + body))

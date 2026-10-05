@@ -15,7 +15,7 @@ sources:
     last_modified: 2024-02-02T00:00:00Z
   - id: catalog
     resource: https://kislingjeff-oss.github.io/JAKPublicBlogDatabase/
-    title: "Jeff Kisling — Complete Writings (searchable catalog)"
+    title: "Jeff Kisling's Journal (searchable catalog)"
     author: human:jkisling
 ---
 
@@ -49,4 +49,4 @@ Every post is searchable in the [complete catalog](https://kislingjeff-oss.githu
 * Activism (64)
 
 [^blog]: Quakers and Mutual Aid (formerly Quakers and Religious Socialism)
-[^catalog]: Jeff Kisling — Complete Writings
+[^catalog]: Jeff Kisling's Journal

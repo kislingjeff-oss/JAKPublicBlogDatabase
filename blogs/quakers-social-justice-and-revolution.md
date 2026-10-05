@@ -15,7 +15,7 @@ sources:
     last_modified: 2022-01-19T00:00:00Z
   - id: catalog
     resource: https://kislingjeff-oss.github.io/JAKPublicBlogDatabase/
-    title: "Jeff Kisling — Complete Writings (searchable catalog)"
+    title: "Jeff Kisling's Journal (searchable catalog)"
     author: human:jkisling
 ---
 
@@ -49,4 +49,4 @@ Every post is searchable in the [complete catalog](https://kislingjeff-oss.githu
 * First Nation-Farmer Climate Unity March (156)
 
 [^blog]: Quakers, social justice and revolution
-[^catalog]: Jeff Kisling — Complete Writings
+[^catalog]: Jeff Kisling's Journal
