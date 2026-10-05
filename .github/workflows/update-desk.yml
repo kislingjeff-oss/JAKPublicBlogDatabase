@@ -1,7 +1,8 @@
 name: Update the Journal Research Desk
 
-# Once a day, reads every post from all eight blogs, rebuilds the post list in
-# desk/index.html, and commits only when a post was added, edited or removed.
+# Once a day, reads Channels Into Knowledge, adds new posts to desk/index.html
+# (and updates edited or removed ones), and commits only when something changed.
+# Posts from the other seven blogs are left as they are.
 # GitHub Pages republishes the desk after each commit:
 # https://kislingjeff-oss.github.io/JAKPublicBlogDatabase/desk/
 
@@ -37,7 +38,7 @@ jobs:
       - name: Install tools
         run: pip install beautifulsoup4 markdownify pyyaml
 
-      - name: Rebuild the desk from all eight blogs
+      - name: Add new Channels Into Knowledge posts
         run: python3 scripts/update_desk.py
 
       - name: Check OKF v0.2 conformance

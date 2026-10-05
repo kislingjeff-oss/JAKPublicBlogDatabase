@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
-"""Rebuild the Journal Research Desk (desk/index.html) from all eight blogs.
+"""Add new Channels Into Knowledge posts to the Journal Research Desk.
 
-Run once a day by .github/workflows/update-desk.yml. It downloads every
-published post from each blog, keeps one copy of any article that appears on
-more than one blog (the most recent copy, using the same rule as the catalog),
-and writes the post list into desk/template.html to make desk/index.html.
+Run once a day by .github/workflows/update-desk.yml. It reads every post on
+https://channelsintoknowledge.com/ and rebuilds that blog's entries in
+desk/index.html, so new posts are added and edited or deleted posts are
+updated. Posts from the other seven blogs stay exactly as they are.
 
-Because it rebuilds from the live blogs each time, it also picks up edited
-titles, tags and text, and drops posts that were deleted.
+When a Channels Into Knowledge post is a copy of an article from another blog,
+the older copy is taken out of the list and linked from the new post under
+"Also published at", so each article still appears once.
 
-Safety: if any blog cannot be read, or the number of posts falls by more than
-2% compared with the current desk, nothing is written and the run fails, so a
-bad day on one of the blog hosts never empties the app.
+Safety: if the blog cannot be read, or it returns far fewer posts than the
+desk already has, nothing is written and the run fails.
 
 Run by hand:  python3 scripts/update_desk.py
 Needs:        pip install beautifulsoup4 markdownify
@@ -24,8 +24,6 @@ import sys
 import time
 import urllib.error
 import urllib.request
-import xml.etree.ElementTree as ET
-from email.utils import parsedate_to_datetime
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 
@@ -34,25 +32,15 @@ from markdownify import MarkdownConverter
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
-sys.path.insert(0, HERE)
-from update_channels import find_duplicates, html_to_text  # same duplicate rule as the catalog
-
 DESK = os.path.join(ROOT, "desk")
 TEMPLATE = os.path.join(DESK, "template.html")
 OUTPUT = os.path.join(DESK, "index.html")
-MAX_DROP = 0.02
 
-# id: (name, slug, source). Source is a WordPress site or "substack".
-BLOGS = {
-    1: ("Active Objection", "active-objection", "substack"),
-    8: ("Channels Into Knowledge", "channels-into-knowledge", "channelsintoknowledge.com"),
-    6: ("First Nation-Farmer Unity", "first-nation-farmer-unity", "firstnationfarmer.com"),
-    5: ("LANDBACK Friends", "landback-friends", "landbackfriends.com"),
-    3: ("New Conscientious Objector (NewCO)", "new-conscientious-objector", "newconscientiousobjector.com"),
-    4: ("Quakers and Mutual Aid (formerly Quakers and Religious Socialism)", "quakers-and-mutual-aid", "quakersandreligioussocialism.com"),
-    7: ("Quakers, social justice and revolution", "quakers-social-justice-and-revolution", "jeffkisling.com"),
-    2: ("Unflinching", "unflinching", "unflinching.blog"),
-}
+BLOG_NAME = "Channels Into Knowledge"
+BLOG_SITE = "channelsintoknowledge.com"
+MIN_SHARE = 0.5          # stop if the blog returns under half the posts the desk has for it
+SAME_TITLE_OVERLAP = 0.6 # share of words in common to call two posts with one title copies
+NEAR_IDENTICAL = 0.9     # share of words in common to call two posts copies whatever the title
 SKIP_TAGS = {"uncategorized"}
 STOP = set("""a an the and or but of to in on at for with by from as is are was were be been being it its this
 that these those i me my we our you your he she they them his her their not no so if then than there here what
@@ -102,49 +90,6 @@ def fetch_wordpress(sid, site):
                     "published": iso_utc(p.get("date_gmt") or p["date"]),
                     "html": p["content"]["rendered"], "terms": terms, "sub": ""})
     return out
-
-
-def fetch_substack(sid):
-    """Returns (posts, complete). Substack often refuses requests from cloud
-    servers such as GitHub's, so this falls back to the blog's RSS feed, which
-    lists only the most recent posts (complete=False)."""
-    try:
-        return fetch_substack_api(sid), True
-    except Exception as e:
-        print(f"Active Objection: full list unavailable ({e}); using the RSS feed.", flush=True)
-    try:
-        req = urllib.request.Request("https://activeobjection.substack.com/feed", headers=UA)
-        with urllib.request.urlopen(req, timeout=90) as r:
-            root = ET.fromstring(r.read())
-    except Exception as e:
-        print(f"Active Objection: feed unavailable too ({e}); keeping the posts already in the desk.", flush=True)
-        return [], False
-    ns = {"content": "http://purl.org/rss/1.0/modules/content/"}
-    out = []
-    for it in root.iter("item"):
-        out.append({"s": sid, "t": it.findtext("title") or "", "u": it.findtext("link"),
-                    "published": parsedate_to_datetime(it.findtext("pubDate")).astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-                    "html": it.findtext("content:encoded", default="", namespaces=ns),
-                    "terms": [c.text for c in it.findall("category") if c.text], "sub": it.findtext("description") or ""})
-    return out, False
-
-
-def fetch_substack_api(sid):
-    arch, off = [], 0
-    while True:
-        a, _ = get(f"https://activeobjection.substack.com/api/v1/archive?sort=new&offset={off}&limit=50")
-        if not a:
-            break
-        arch += a
-        off += len(a)
-
-    def one(a):
-        p, _ = get(f"https://activeobjection.substack.com/api/v1/posts/{a['slug']}")
-        return {"s": sid, "t": p["title"], "u": p.get("canonical_url"),
-                "published": iso_utc(p["post_date"]), "html": p.get("body_html") or "",
-                "terms": [t["name"] for t in p.get("postTags", [])], "sub": p.get("subtitle") or ""}
-    with ThreadPoolExecutor(4) as ex:
-        return list(ex.map(one, arch))
 
 
 # ------------------------------------------------------------------ text
@@ -218,26 +163,33 @@ def current_data():
     return json.loads(m.group(1).replace("<\\/", "</")) if m else {"blogs": [], "posts": []}
 
 
+def norm_title(s):
+    return re.sub(r"[^a-z0-9]+", " ", html.unescape(s).lower()).strip()
+
+
+def overlap(a, b):
+    return len(a & b) / len(a | b) if a and b else 0.0
+
+
 def main():
     current = current_data()
-    old = len(current["posts"])
-    raw, partial = [], set()
-    for sid, (name, slug, src) in BLOGS.items():
-        try:
-            if src == "substack":
-                got, complete = fetch_substack(sid)
-                if not complete:
-                    partial.add(sid)
-            else:
-                got = fetch_wordpress(sid, src)
-        except Exception as e:
-            sys.exit(f"Stopped: could not read {name} ({e}). The desk was not changed.")
-        if not got and sid not in partial:
-            sys.exit(f"Stopped: {name} returned no posts. The desk was not changed.")
-        print(f"{name}: {len(got)} posts", flush=True)
-        raw += got
+    names = [b["name"] for b in current["blogs"]]
+    if BLOG_NAME not in names:
+        sys.exit(f"Stopped: the desk has no blog named {BLOG_NAME}.")
+    bi = names.index(BLOG_NAME)
+    previous = {e["u"]: e for e in current["posts"] if e["b"] == bi}
+    others = [e for e in current["posts"] if e["b"] != bi]
 
-    posts = []
+    try:
+        raw = fetch_wordpress(8, BLOG_SITE)
+    except Exception as e:
+        sys.exit(f"Stopped: could not read {BLOG_NAME} ({e}). The desk was not changed.")
+    if len(raw) < len(previous) * MIN_SHARE:
+        sys.exit(f"Stopped: {BLOG_NAME} returned {len(raw)} posts but the desk has {len(previous)}. "
+                 "The desk was not changed.")
+    print(f"{BLOG_NAME}: {len(raw)} posts", flush=True)
+
+    fresh = []
     for p in raw:
         if not p["u"] or not p["published"]:
             continue
@@ -246,72 +198,55 @@ def main():
             t = html.unescape(t).strip()
             if t and t.lower() not in SKIP_TAGS and t.lower() not in (x.lower() for x in tags):
                 tags.append(t)
-        posts.append({"s": p["s"], "t": html.unescape(p["t"]).strip() or "(untitled)",
-                      "sub": html.unescape(p["sub"]).strip(), "u": p["u"], "d": p["published"][:10],
-                      "x": html_to_text(p["html"]), "html": p["html"], "tags": tags})
-
-    # A blog read only through its feed: keep the posts already in the desk as
-    # they are, and add only feed posts the desk does not have yet.
-    carried = []
-    if partial:
-        names = [b["name"] for b in current["blogs"]]
-        for e in current["posts"]:
-            sid = next((s for s in partial if names[e["b"]] == BLOGS[s][0]), None)
-            if sid:
-                carried.append((sid, e))
-        known = {e["u"] for _, e in carried} | {u for _, e in carried for u in e.get("a", [])}
-        posts = [p for p in posts if not (p["s"] in partial and p["u"] in known)]
-        print(f"Kept {len(carried)} posts already in the desk from blogs read through their feed.")
-
-    hidden, also = find_duplicates(posts)
-    hidden = set(hidden)
-    keep = [p for p in posts if p["u"] not in hidden]
-
-    if old and len(keep) + len(carried) < old * (1 - MAX_DROP):
-        sys.exit(f"Stopped: found {len(keep) + len(carried)} posts but the desk has {old}. "
-                 "One of the blogs may be having trouble. The desk was not changed.")
-
-    order = sorted(BLOGS, key=lambda sid: BLOGS[sid][0].lower())
-    bidx = {sid: i for i, sid in enumerate(order)}
-    entries = []
-    for p in keep:
         text = body_text(p["html"])
-        fallback = clean(p["sub"] or first_sentence(p["x"]) or "")
         words = set(w for w in re.findall(r"[a-z0-9][a-z0-9'’-]{2,}", text.lower()) if w not in STOP)
-        entries.append({"t": p["t"], "d": p["d"], "b": bidx[p["s"]], "u": p["u"], "g": p["tags"],
-                        "s": summarize(text, fallback), "w": len(text.split()),
-                        "a": [u for _, _, u in also.get(p["u"], [])], "x": " ".join(sorted(words))})
-    if partial:
-        # Keep links to copies on a feed-only blog that this run could not compare.
-        prev = {e["u"]: e for e in current["posts"]}
-        for e in entries:
-            for u in prev.get(e["u"], {}).get("a", []):
-                if u not in e["a"] and "substack.com" in u:
-                    e["a"].append(u)
-    for sid, e in carried:
-        entries.append(dict(e, b=bidx[sid]))
-    entries.sort(key=lambda e: (e["d"], e["u"]), reverse=True)
+        title = html.unescape(p["t"]).strip() or "(untitled)"
+        fresh.append({"t": title, "d": p["published"][:10], "b": bi, "u": p["u"], "g": tags,
+                      "s": summarize(text, clean(first_sentence(text))), "w": len(text.split()),
+                      "a": list(previous.get(p["u"], {}).get("a", [])), "x": " ".join(sorted(words))})
+
+    # Find older copies on the other blogs and fold them into the new post.
+    folded = 0
+    for e in fresh:
+        if e["u"] in previous:
+            continue                    # already checked when it was first added
+        mine, title = set(e["x"].split()), norm_title(e["t"])
+        for o in list(others):
+            if o["d"] > e["d"]:
+                continue
+            share = overlap(mine, set(o["x"].split()))
+            same_title = norm_title(o["t"]) == title
+            if (same_title and share >= SAME_TITLE_OVERLAP) or (share >= NEAR_IDENTICAL and len(mine) >= 80):
+                others.remove(o)
+                e["a"] += [u for u in [o["u"]] + o.get("a", []) if u not in e["a"]]
+                folded += 1
+                print(f"  {e['t']}: copy of {o['u']}")
+
+    added = [e for e in fresh if e["u"] not in previous]
+    removed = [u for u in previous if u not in {e["u"] for e in fresh}]
+    entries = sorted(others + fresh, key=lambda e: (e["d"], e["u"]), reverse=True)
 
     blogs = []
-    for sid in order:
-        dates = [e["d"] for e in entries if e["b"] == bidx[sid]]
-        blogs.append({"name": BLOGS[sid][0], "slug": BLOGS[sid][1], "count": len(dates),
-                      "first": min(dates) if dates else "", "last": max(dates) if dates else ""})
+    for i, b in enumerate(current["blogs"]):
+        dates = [e["d"] for e in entries if e["b"] == i]
+        blogs.append(dict(b, count=len(dates), first=min(dates) if dates else "", last=max(dates) if dates else ""))
 
     data = {"generated": datetime.now(timezone.utc).strftime("%Y-%m-%d"), "blogs": blogs, "posts": entries}
     blob = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
     page = open(TEMPLATE, encoding="utf-8").read().replace("__DATA__", blob)
 
     # Leave the file alone when only the date changed, so quiet days make no commit.
-    if os.path.exists(OUTPUT):
-        prev = open(OUTPUT, encoding="utf-8").read()
-        strip = lambda s: re.sub(r'"generated":"\d{4}-\d\d-\d\d"', "", s)
-        if strip(prev) == strip(page):
-            print(f"No changes. {len(entries)} posts.")
-            return
+    prev_page = open(OUTPUT, encoding="utf-8").read() if os.path.exists(OUTPUT) else ""
+    strip = lambda s: re.sub(r'"generated":"\d{4}-\d\d-\d\d"', "", s)
+    if strip(prev_page) == strip(page):
+        print(f"No changes. {len(entries)} posts.")
+        return
     with open(OUTPUT, "w", encoding="utf-8", newline="\n") as f:
         f.write(page)
-    print(f"Wrote desk/index.html: {len(entries)} posts (was {old}), {sum(len(e["a"]) for e in entries)} copies linked.")
+    print(f"Wrote desk/index.html: {len(entries)} posts. Added {len(added)}, "
+          f"removed {len(removed)}, folded in {folded} older copies.")
+    for e in added:
+        print(f"  new: {e['d']} {e['t']}")
 
 
 if __name__ == "__main__":
