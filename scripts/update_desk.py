@@ -112,9 +112,13 @@ def fetch_substack(sid):
         return fetch_substack_api(sid), True
     except Exception as e:
         print(f"Active Objection: full list unavailable ({e}); using the RSS feed.", flush=True)
-    req = urllib.request.Request("https://activeobjection.substack.com/feed", headers=UA)
-    with urllib.request.urlopen(req, timeout=90) as r:
-        root = ET.fromstring(r.read())
+    try:
+        req = urllib.request.Request("https://activeobjection.substack.com/feed", headers=UA)
+        with urllib.request.urlopen(req, timeout=90) as r:
+            root = ET.fromstring(r.read())
+    except Exception as e:
+        print(f"Active Objection: feed unavailable too ({e}); keeping the posts already in the desk.", flush=True)
+        return [], False
     ns = {"content": "http://purl.org/rss/1.0/modules/content/"}
     out = []
     for it in root.iter("item"):
@@ -228,7 +232,7 @@ def main():
                 got = fetch_wordpress(sid, src)
         except Exception as e:
             sys.exit(f"Stopped: could not read {name} ({e}). The desk was not changed.")
-        if not got:
+        if not got and sid not in partial:
             sys.exit(f"Stopped: {name} returned no posts. The desk was not changed.")
         print(f"{name}: {len(got)} posts", flush=True)
         raw += got
