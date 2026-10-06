@@ -1,18 +1,18 @@
 ---
 type: Blog
 title: "Channels Into Knowledge"
-description: "Channels Into Knowledge, 53 posts from 2026-08-07 to 2026-10-03."
+description: "Channels Into Knowledge, 54 posts from 2026-08-07 to 2026-10-05."
 resource: https://channelsintoknowledge.com
 tags: [blog, writings]
 status: stable
 author: "Jeff Kisling"
-generated: { by: process:jak-blog-db-update/1, at: 2026-10-03T00:00:00Z }
+generated: { by: process:jak-blog-db-update/1, at: 2026-10-05T00:00:00Z }
 sources:
   - id: blog
     resource: https://channelsintoknowledge.com
     title: "Channels Into Knowledge"
     author: human:jkisling
-    last_modified: 2026-10-03T00:00:00Z
+    last_modified: 2026-10-05T00:00:00Z
   - id: catalog
     resource: https://kislingjeff-oss.github.io/JAKPublicBlogDatabase/
     title: "Jeff Kisling's Journal (searchable catalog)"
@@ -25,11 +25,11 @@ Blog by Jeff Kisling at <https://channelsintoknowledge.com>.[^blog]
 
 | | |
 |---|---|
-| Posts published | 53 |
-| Shown in the catalog | 53 |
+| Posts published | 54 |
+| Shown in the catalog | 54 |
 | Left out as copies of a newer post on another blog | 0 |
 | First post | 2026-08-07 |
-| Most recent post | 2026-10-03 |
+| Most recent post | 2026-10-05 |
 
 Every post is searchable in the [complete catalog](https://kislingjeff-oss.github.io/JAKPublicBlogDatabase/).[^catalog]
 

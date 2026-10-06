@@ -1,5 +1,8 @@
 # Update Log
 
+## 2026-10-06
+* **Update**: Added [Research Desk](https://channelsintoknowledge.com/2026/10/05/research-desk/) (2026-10-05) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
+
 ## 2026-10-04
 * **Update**: Copies of the same article on more than one blog now show once, as the most recent copy (the newer blog on a tie); 187 copies are left out and linked from the kept post. Recorded per blog in [blogs/](/blogs/index.md).
 * **Update**: Added a button to make a linked reading list of the articles shown.
