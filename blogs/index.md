@@ -7,4 +7,4 @@
 * [Unflinching](unflinching.md) - Unflinching, 413 posts from 2024-02-02 to 2025-07-10.
 * [New Conscientious Objector (NewCO)](new-conscientious-objector.md) - New Conscientious Objector (NewCO), 255 posts from 2025-01-29 to 2026-03-16.
 * [Active Objection](active-objection.md) - Active Objection, 65 posts from 2026-04-07 to 2026-07-16.
-* [Channels Into Knowledge](channels-into-knowledge.md) - Channels Into Knowledge, 54 posts from 2026-08-07 to 2026-10-05.
+* [Channels Into Knowledge](channels-into-knowledge.md) - Channels Into Knowledge, 53 posts from 2026-08-07 to 2026-10-03.
