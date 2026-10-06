@@ -875,10 +875,10 @@ function initFacts(){
   if(FX) return;
   FX=JSON.parse($("facts-data").textContent).topics;
   $("fx-topics").innerHTML=FX.map(function(t,i){return '<button type="button" class="fx-topic" aria-pressed="false" data-i="'+i+'">'+esc(t.short)+' <span class="n">'+t.facts.length+'</span></button>';}).join("");
-  $("fx-topics").addEventListener("click",function(e){var b=e.target.closest(".fx-topic"); if(!b) return; fxStick(); fxShow(+b.dataset.i);});
-  $("fx-q").addEventListener("focus",fxStick); $("fx-fixed").addEventListener("change",fxStick);
+  $("fx-topics").addEventListener("click",function(e){var b=e.target.closest(".fx-topic"); if(!b) return; fxShow(+b.dataset.i); fxToTableTop();});
   $("fx-q").addEventListener("input",fxRender); $("fx-fixed").addEventListener("change",fxRender); $("fx-copy").addEventListener("click",fxCopy);
   var start=0; try{ var s=localStorage.getItem("desk-facts-topic"); FX.forEach(function(t,i){ if(t.slug===s) start=i; }); }catch(e){}
+  fxStick();
   fxShow(start);
   fxThTop();
   if(window.ResizeObserver) new ResizeObserver(fxThTop).observe($("fx-sticky")); else window.addEventListener("resize",fxThTop);
@@ -887,6 +887,11 @@ function fxThTop(){
   var nav=document.querySelector("nav.tabs"), h=nav?nav.getBoundingClientRect().height:52, s=$("fx-sticky");
   if(s.classList.contains("stuck")) h+=s.getBoundingClientRect().height;
   document.documentElement.style.setProperty("--fx-th-top",Math.round(h)+"px");
+}
+function fxToTableTop(){
+  var box=document.querySelector(".fx-box"), top=parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--fx-th-top"))||52;
+  var y=box.getBoundingClientRect().top+window.scrollY-top;
+  if(window.scrollY>y) window.scrollTo(0,Math.max(0,y));
 }
 function fxStick(){
   var nav=document.querySelector("nav.tabs"); document.documentElement.style.setProperty("--fx-top",(nav?nav.getBoundingClientRect().height:52)+"px");
@@ -939,7 +944,8 @@ function showTab(name, focus){
   document.body.classList.toggle("wide", name==="search"||name==="facts");
   if(name==="facts") initFacts();
   if(name==="selected") renderSelected();
-  if(focus) $("tab-"+name).focus();
+  if(focus) $("tab-"+name).focus({preventScroll:true});
+  window.scrollTo(0,0);
   try{ history.replaceState(null,"","#"+name); }catch(e){}
 }
 
