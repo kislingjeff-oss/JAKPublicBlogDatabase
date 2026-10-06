@@ -326,7 +326,7 @@ footer{border-top:1px solid var(--line);padding-block:18px;color:var(--ink-3);fo
   <!-- SELECTED & EXPORT -->
   <section class="panel" id="panel-selected" role="tabpanel" aria-labelledby="tab-selected" hidden>
     <h2>Selected articles</h2>
-    <p class="lede">The articles found by your search on the Search tab are selected here. Remove any you want to leave out, then copy or download the list. Every title in the export links to the original post.</p>
+    <p class="lede">The articles found by your search on the Search tab are selected here. Remove any you want to leave out, then copy or download the list. Every article in the export has a working link to the original post: the title is linked, and the web address is shown under it.</p>
     <div class="export-grid">
       <div class="box">
         <div class="toolbar" style="padding-top:0">
@@ -708,7 +708,7 @@ function buildExport(fmt){
     var head=["Title","URL"]; if(o.meta) head.push("Blog","Date"); if(o.age) head.push("Age range","Mature themes"); if(o.tags) head.push("Tags"); if(o.sum) head.push("Summary"); if(o.also) head.push("Other copies");
     var rows=[head.join(",")];
     list.forEach(function(p){
-      var r=[p.t,p.u]; if(o.meta) r.push(BLOGS[p.b].name,p.d); if(o.age) r.push(ageLabel(p),(p.th||[]).join("; ")); if(o.tags) r.push((p.g||[]).join("; ")); if(o.sum) r.push(p.s||""); if(o.also) r.push((p.a||[]).join(" "));
+      var r=['=HYPERLINK("'+p.u.replace(/"/g,'%22')+'","'+String(p.t).slice(0,250).replace(/"/g,'""')+'")',p.u]; if(o.meta) r.push(BLOGS[p.b].name,p.d); if(o.age) r.push(ageLabel(p),(p.th||[]).join("; ")); if(o.tags) r.push((p.g||[]).join("; ")); if(o.sum) r.push(p.s||""); if(o.also) r.push((p.a||[]).join(" "));
       rows.push(r.map(csvCell).join(","));
     });
     return rows.join("\n");
@@ -720,7 +720,7 @@ function buildExport(fmt){
       md+=bullet+"["+mdEsc(p.t)+"]("+p.u+")";
       if(o.meta) md+=" | "+BLOGS[p.b].name+", "+fmtDate(p.d);
       if(o.age) md+=" | "+ageLabel(p)+(p.th&&p.th.length?" (mature themes: "+p.th.join(", ")+")":"");
-      md+="\n";
+      md+="\n"+pad+"<"+p.u+">\n";
       if(o.sum && p.s) md+=pad+p.s+"\n";
       if(o.tags && p.g && p.g.length) md+=pad+"Tags: "+p.g.join(", ")+"\n";
       if(o.also && p.a && p.a.length) md+=pad+"Also published at: "+p.a.map(function(u){return "<"+u+">";}).join(", ")+"\n";
@@ -747,6 +747,7 @@ function buildExport(fmt){
     h+='<li><a href="'+esc(p.u)+'">'+esc(p.t)+'</a>';
     if(o.meta) h+=' <span style="color:#000000">('+esc(BLOGS[p.b].name)+', '+fmtDate(p.d)+')</span>';
     if(o.age) h+=' <strong>'+esc(ageLabel(p))+'</strong>'+(p.th&&p.th.length?' <span style="font-size:90%">(mature themes: '+esc(p.th.join(", "))+')</span>':'');
+    h+='<br><a href="'+esc(p.u)+'" style="font-size:90%">'+esc(p.u)+'</a>';
     if(o.sum && p.s) h+='<p>'+esc(p.s)+'</p>';
     if(o.tags && p.g && p.g.length) h+='<p style="color:#000000;font-size:90%">Tags: '+esc(p.g.join(", "))+'</p>';
     if(o.also && p.a && p.a.length) h+='<p style="color:#000000;font-size:90%">Also published at: '+p.a.map(function(u){return '<a href="'+esc(u)+'">'+esc(u)+'</a>';}).join(", ")+'</p>';
@@ -773,18 +774,31 @@ function copyExport(){
     return;
   }
   if(navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(out).then(function(){flash("export-status","Copied.");}, function(){ var ta=$("preview-text"); ta.focus(); ta.select(); flash("export-status","Press Ctrl+C or Cmd+C to copy the selected text."); });
-  } else { var ta=$("preview-text"); ta.focus(); ta.select(); flash("export-status","Press Ctrl+C or Cmd+C to copy the selected text."); }
+    navigator.clipboard.writeText(out).then(function(){flash("export-status","Copied.");}, function(){ copyTextarea(); });
+  } else copyTextarea();
+}
+function copyTextarea(){
+  var ta=$("preview-text"); ta.focus(); ta.select(); var ok=false; try{ ok=document.execCommand("copy"); }catch(e){}
+  flash("export-status", ok?"Copied.":"Press Ctrl+C or Cmd+C to copy the selected text.");
 }
 function selectRendered(){
   var r=document.createRange(); r.selectNodeContents($("preview-html")); var s=window.getSelection(); s.removeAllRanges(); s.addRange(r);
-  flash("export-status","Press Ctrl+C or Cmd+C to copy the selected list.");
+  var ok=false; try{ ok=document.execCommand("copy"); }catch(e){}
+  if(ok){ s.removeAllRanges(); flash("export-status","Copied with working links. Paste it into an email or document."); }
+  else flash("export-status","Press Ctrl+C or Cmd+C to copy the selected list.");
 }
+var DL=null;
+if(window.claude && typeof window.claude.use==="function"){ window.claude.use("downloads").then(function(d){ DL=d||null; }, function(){}); }
 function downloadExport(){
   var map={html:["html","text/html"],md:["md","text/markdown"],txt:["txt","text/plain"],csv:["csv","text/csv"]}[FMT];
   var body=buildExport(FMT);
   if(FMT==="html") body='<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><title>'+esc(opts().title)+'</title></head>\n<body style="font-family:Arial,Helvetica,sans-serif;max-width:760px;margin:2em auto;padding:0 1em;line-height:1.5">\n'+body+'</body></html>\n';
   var name=(opts().title.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"reading-list")+"."+map[0];
+  if(DL){
+    DL.save({filename:name,data:body}).then(function(){flash("export-status","Saved "+name+".");},
+      function(e){ flash("export-status", e&&e.code==="declined"?"Download cancelled.":"This view could not save the file. Use Copy instead."); });
+    return;
+  }
   try{
     var url=URL.createObjectURL(new Blob([body],{type:map[1]+";charset=utf-8"}));
     var a=document.createElement("a"); a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove();
