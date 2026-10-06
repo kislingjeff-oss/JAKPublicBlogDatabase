@@ -245,6 +245,63 @@ footer{border-top:1px solid var(--line);padding-block:18px;color:var(--ink-3);fo
 .fx-unv li{margin-bottom:8px}
 @media (min-width:701px){.fx-box{overflow:visible}.fx-table{min-width:0}.fx-table th:first-child{border-top-left-radius:var(--r)}.fx-table th:last-child{border-top-right-radius:var(--r)}}
 @media (max-width:700px){.fx-table{min-width:0}.fx-table thead{display:none}.fx-table tr{display:grid;gap:6px;padding:12px;border-bottom:1px solid var(--line)}.fx-table td{padding:0;border:0;width:auto!important}.fx-table td.s::before{content:"Source"}.fx-table td.p::before{content:"In the posts"}.fx-table td.s::before,.fx-table td.p::before{display:block;font-size:.7rem;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);margin-top:6px}}
+
+/* Ten Years of Stories tab */
+.ts-intro{max-width:none;margin:0 0 6px}
+.ts-controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:10px 0 6px}
+.ts-controls .input{flex:1 1 280px;min-width:0;width:auto;border-radius:999px;padding:10px 18px}
+.ts-btn{appearance:none;border:0;background:var(--accent);color:#fff;border-radius:999px;padding:10px 20px;font-weight:700;cursor:pointer}
+.ts-btn:hover{background:#285c51}
+.ts-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px}
+.ts-chip{appearance:none;display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:4px 11px;font-size:.84rem;font-weight:600;cursor:pointer}
+.ts-chip[aria-pressed="false"]{opacity:.45}
+.ts-chip[aria-pressed="false"] .dot{background:transparent!important;box-shadow:inset 0 0 0 2px var(--ink-3)}
+.ts-cap{display:flex;justify-content:space-between;gap:10px;font-size:.86rem;color:var(--ink-3);margin-top:8px}
+.ts-river-box{overflow-x:auto;padding-block:8px 4px;scrollbar-width:thin}
+.ts-river{display:flex;align-items:flex-end;gap:2px;height:140px;min-width:900px}
+.ts-yr{display:flex;align-items:flex-end;gap:2px;flex:1;height:100%;padding-bottom:22px;position:relative}
+.ts-yr::after{content:attr(data-y);position:absolute;left:2px;bottom:0;font:700 .78rem var(--font-ui);color:var(--ink-3)}
+.ts-yr+.ts-yr{border-left:1px dashed var(--line);padding-left:2px}
+.ts-m{flex:1;min-width:4px;border:0;padding:0;background:var(--accent);opacity:.35;border-radius:4px 4px 1px 1px;cursor:pointer}
+.ts-m:hover{opacity:.7}
+.ts-m.on{opacity:1;background:#e4572e}
+.ts-m.zero{background:var(--line);opacity:1;cursor:default}
+.ts-stage{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:22px;align-items:start;margin-top:14px}
+@media (max-width:900px){.ts-stage{grid-template-columns:minmax(0,1fr)}}
+.ts-list-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:8px}
+.ts-list-head h3{font:700 1.35rem/1.15 var(--font-read);margin:0}
+.ts-list-head span{color:var(--ink-3);font-size:.9rem;font-variant-numeric:tabular-nums}
+.ts-list{display:grid;gap:6px;max-height:70vh;overflow-y:auto;padding-right:4px;scrollbar-width:thin}
+@media (max-width:900px){.ts-list{max-height:none}}
+.ts-item{appearance:none;text-align:left;display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 12px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;cursor:pointer;color:var(--ink)}
+.ts-item:hover{border-color:var(--ink-3)}
+.ts-item[aria-current="true"]{border-color:var(--accent);box-shadow:inset 4px 0 0 #e4572e}
+.ts-day{font:800 1.2rem/1 var(--font-ui);font-variant-numeric:tabular-nums;min-width:2.2ch;text-align:center;padding-top:2px}
+.ts-day small{display:block;font:600 .62rem var(--font-ui);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.ts-tt{font-weight:700;line-height:1.3}
+.ts-meta{grid-column:2;font-size:.8rem;color:var(--ink-3);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ts-flag{font-weight:700;color:#c2410c}
+.ts-story{position:sticky;top:var(--ts-top,64px);display:grid;gap:14px}
+@media (max-width:900px){.ts-story{position:static}}
+.ts-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px 22px}
+.ts-pmeta{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;font-size:.88rem}
+.ts-title{font:800 clamp(1.35rem,2.4vw,1.8rem)/1.15 var(--font-read);margin:10px 0;text-wrap:balance}
+.ts-sum{margin:0 0 16px}
+.ts-read{display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:var(--card);text-decoration:none;font-weight:700;border-radius:999px;padding:9px 18px}
+.ts-read:hover{background:var(--accent);color:#fff}
+.ts-url{display:block;margin-top:8px;font-size:.8rem;color:var(--ink-3);overflow-wrap:anywhere}
+.ts-nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px}
+.ts-event{background:#fffbd6;color:#2a2410;border:2px solid #f3df7a;border-radius:var(--r);padding:18px 20px}
+.ts-event a{color:#2a2410}
+.ts-etop{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between;margin-bottom:8px}
+.ts-event h4{font:800 .8rem/1 var(--font-ui);letter-spacing:.12em;text-transform:uppercase;margin:0}
+.ts-gap{font-weight:700;font-size:.85rem;background:rgba(255,255,255,.85);border-radius:999px;padding:3px 11px}
+.ts-when{font:800 1.25rem/1.15 var(--font-read);margin:4px 0 6px}
+.ts-event p{margin:0 0 10px}
+.ts-src{font-size:.88rem}
+.ts-topic{display:inline-block;font-size:.75rem;font-weight:700;border:1px solid #e9cf5c;border-radius:999px;padding:1px 9px;margin-right:6px}
+.ts-cited h4{font:800 .8rem/1 var(--font-ui);letter-spacing:.12em;text-transform:uppercase;margin:0 0 10px}
+.ts-cited ul{margin:0;padding-left:1.1em;display:grid;gap:8px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
@@ -267,6 +324,7 @@ footer{border-top:1px solid var(--line);padding-block:18px;color:var(--ink-3);fo
     <button class="tab" role="tab" id="tab-selected" aria-controls="panel-selected" aria-selected="false" tabindex="-1">Selected &amp; Export <span class="count-pill" id="sel-count">0</span></button>
     <button class="tab" role="tab" id="tab-browse" aria-controls="panel-browse" aria-selected="false" tabindex="-1">Browse</button>
     <button class="tab" role="tab" id="tab-facts" aria-controls="panel-facts" aria-selected="false" tabindex="-1">Verified Facts</button>
+    <button class="tab" role="tab" id="tab-stories" aria-controls="panel-stories" aria-selected="false" tabindex="-1">Ten Years of Stories</button>
     <button class="tab" role="tab" id="tab-ages" aria-controls="panel-ages" aria-selected="false" tabindex="-1">Age Ranges</button>
     <button class="tab" role="tab" id="tab-about" aria-controls="panel-about" aria-selected="false" tabindex="-1">About</button>
   </div>
@@ -477,6 +535,23 @@ footer{border-top:1px solid var(--line);padding-block:18px;color:var(--ink-3);fo
     <details class="fx-unv" id="fx-unv" hidden><summary id="fx-unv-sum"></summary>
       <p>These statements appear in the posts but could not be checked against an outside source. They are not confirmed and not shown to be wrong.</p>
       <ul id="fx-unv-list"></ul></details>
+  </section>
+
+  <section class="panel" id="panel-stories" role="tabpanel" aria-labelledby="tab-stories" hidden>
+    <h2>Ten Years of Stories</h2>
+    <p class="lede ts-intro">Every post, set beside what was happening in the world. Pick a month, open a story, and see the closest event from the Verified Facts collection.</p>
+    <div class="ts-controls">
+      <label class="sr" for="ts-q">Search every post</label>
+      <input class="input" id="ts-q" type="search" placeholder="Search every post: try “Standing Rock”, “bicycle” or “Scattergood”">
+      <button class="ts-btn" type="button" id="ts-go">Search</button>
+    </div>
+    <div class="ts-chips" id="ts-chips" role="group" aria-label="Blogs"></div>
+    <div class="ts-cap"><span id="ts-cap">Posts per month. Tap a bar to open that month.</span><span id="ts-hover"></span></div>
+    <div class="ts-river-box"><div class="ts-river" id="ts-river" role="group" aria-label="Posts per month"></div></div>
+    <div class="ts-stage">
+      <section aria-labelledby="ts-list-title"><div class="ts-list-head"><h3 id="ts-list-title"></h3><span id="ts-count"></span></div><div class="ts-list" id="ts-list"></div></section>
+      <section class="ts-story" id="ts-story" aria-live="polite"></section>
+    </div>
   </section>
 
   <section class="panel" id="panel-about" role="tabpanel" aria-labelledby="tab-about" hidden>
@@ -933,8 +1008,84 @@ function fxCopy(){
   fallback();
 }
 
+
+/* ---------- Ten Years of Stories ---------- */
+var TS=null;
+function initStories(){
+  if(TS){ return; }
+  var nav=document.querySelector("nav.tabs"); document.documentElement.style.setProperty("--ts-top",((nav?nav.getBoundingClientRect().height:52)+12)+"px");
+  var MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"], MONL=["January","February","March","April","May","June","July","August","September","October","November","December"];
+  var FT=JSON.parse($("facts-data").textContent).topics, F=[], cited={};
+  function pdate(d){ var m;
+    if((m=/^(\d{4})-(\d{2})-(\d{2})/.exec(d))) return [Date.UTC(+m[1],+m[2]-1,+m[3]), d.length===10?3:2];
+    if((m=/^(\d{4})-(\d{2})(?!\d)/.exec(d))) return [Date.UTC(+m[1],+m[2]-1,15), d.length===7?2:1];
+    if((m=/^(\d{4})/.exec(d))) return [Date.UTC(+m[1],6,1), 1];
+    return null; }
+  FT.forEach(function(t){ t.facts.forEach(function(f){ var pd=pdate(f.d), k=F.length;
+    F.push({d:f.d,s:f.s,v:f.v,topic:t.short,src:f.src[0]||["","",""],t:pd?pd[0]:null,pr:pd?pd[1]:0});
+    f.p.forEach(function(p){ (cited[p[2]]=cited[p[2]]||[]).push(k); }); }); });
+  var PEN={3:0,2:10,1:75,0:400};
+  function day(d){ return Date.UTC(+d.slice(0,4),+d.slice(5,7)-1,+d.slice(8,10)); }
+  function nearest(p){ var t=day(p.d), best=null, bi=-1; F.forEach(function(f,i){ if(f.t==null) return; var sc=Math.abs(f.t-t)/864e5+PEN[f.pr]; if(best===null||sc<best){best=sc;bi=i;} }); return bi; }
+  function citedFor(p){ var out=(cited[p.u]||[]).slice(); (p.a||[]).forEach(function(u){ out=out.concat(cited[u]||[]); }); return out.filter(function(x,i,a){return a.indexOf(x)===i;}); }
+  var SP=POSTS.map(function(p){return p;}).sort(function(a,b){ return a.d<b.d?-1:a.d>b.d?1:(a.t<b.t?-1:1); });
+  SP.forEach(function(p,i){ p.ts=i; });
+  var on=BLOGS.map(function(){return true;}), qw=[], month=null, cur=null, view=[];
+  function vis(p){ if(!on[p.b]) return false; if(!qw.length) return true; var h=p._t+" "+p._s; for(var i=0;i<qw.length;i++) if(h.indexOf(qw[i])<0) return false; return true; }
+  var first=SP[0].d.slice(0,7), last=SP[SP.length-1].d.slice(0,7), months=[];
+  (function(){ var y=+first.slice(0,4), m=+first.slice(5,7); while(true){ var k=y+"-"+String(m).padStart(2,"0"); months.push(k); if(k===last) break; m++; if(m>12){m=1;y++;} } })();
+  function fmtD(d){ return (+d.slice(8,10))+" "+MON[+d.slice(5,7)-1]+" "+d.slice(0,4); }
+  function when(d){ var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d); if(m) return (+m[3])+" "+MONL[+m[2]-1]+" "+m[1]; m=/^(\d{4})-(\d{2})$/.exec(d); if(m) return MONL[+m[2]-1]+" "+m[1]; if(/^\d{4}-\d{2}-\d{2}[–-]\d{4}-\d{2}-\d{2}$/.test(d)) return fmtD(d.slice(0,10))+" to "+fmtD(d.slice(11)); return d.replace("–"," to "); }
+  function gapText(g,pr){ var a=Math.abs(g), side=g<0?"before this post":"after this post";
+    if(pr>=3){ if(a===0) return "Same day as this post"; if(a<14) return a+" day"+(a===1?"":"s")+" "+side; if(a<70) return Math.round(a/7)+" weeks "+side; if(a<700) return Math.round(a/30.4)+" months "+side; return Math.round(a/365.25)+" years "+side; }
+    if(pr===2){ if(a<20) return "The same month as this post"; if(a<700) return "About "+Math.round(a/30.4)+" months "+side; return "About "+Math.round(a/365.25)+" years "+side; }
+    if(a<200) return "The same year as this post"; return "About "+Math.max(1,Math.round(a/365.25))+" years "+side; }
+  $("ts-chips").innerHTML=BLOGS.map(function(b,i){return '<button type="button" class="ts-chip" aria-pressed="true" data-b="'+i+'"><span class="dot" style="background:'+b.color+'"></span>'+esc(shortName(b.name))+'</button>';}).join("");
+  function river(){ var c={}, max=1; SP.forEach(function(p){ if(vis(p)){ var k=p.d.slice(0,7); c[k]=(c[k]||0)+1; } }); months.forEach(function(k){ if((c[k]||0)>max) max=c[k]; });
+    var ys={}; months.forEach(function(k){ (ys[k.slice(0,4)]=ys[k.slice(0,4)]||[]).push(k); });
+    $("ts-river").innerHTML=Object.keys(ys).map(function(y){ return '<div class="ts-yr" data-y="'+y+'">'+ys[y].map(function(k){ var n=c[k]||0, h=n?Math.max(6,Math.round(n/max*112)):3;
+      return '<button type="button" class="ts-m'+(n?'':' zero')+(k===month?' on':'')+'" data-k="'+k+'" style="height:'+h+'px" title="'+MON[+k.slice(5)-1]+' '+k.slice(0,4)+': '+n+' posts" aria-label="'+MONL[+k.slice(5)-1]+' '+k.slice(0,4)+': '+n+' posts"'+(n?'':' disabled')+'></button>'; }).join("")+'</div>'; }).join("");
+    $("ts-cap").textContent=qw.length?"Posts per month that match your search. Tap a bar to open that month.":"Posts per month. Tap a bar to open that month."; }
+  function setMonth(k,keep){ month=k; river(); view=SP.filter(function(p){ return p.d.slice(0,7)===k && vis(p); });
+    $("ts-list-title").textContent=MONL[+k.slice(5)-1]+" "+k.slice(0,4); list(); if(!keep) select(view.length?view[0]:null);
+    var b=document.querySelector('.ts-m[data-k="'+k+'"]'); if(b){ var box=b.closest(".ts-river-box"); box.scrollLeft=Math.max(0,b.offsetLeft-box.clientWidth/2); } }
+  function search(){ qw=norm($("ts-q").value.trim()).split(/\s+/).filter(Boolean);
+    if(!qw.length){ var k=cur?cur.d.slice(0,7):last; setMonth(k, cur&&vis(cur)); return; }
+    month=null; river(); view=SP.filter(vis).reverse(); $("ts-list-title").textContent="Search results"; list();
+    if(view.length && (!cur||view.indexOf(cur)<0)) select(view[0]); }
+  function list(){ var shown=view.slice(0,300);
+    $("ts-count").textContent=view.length===1?"1 post":fmtNum(view.length)+" posts"+(view.length>300?" · showing 300":"");
+    $("ts-list").innerHTML=shown.length? shown.map(function(p){ var n=citedFor(p).length;
+      return '<button type="button" class="ts-item" data-i="'+p.ts+'"'+(p===cur?' aria-current="true"':'')+'><span class="ts-day">'+(+p.d.slice(8))+'<small>'+MON[+p.d.slice(5,7)-1]+(month?'':' '+p.d.slice(2,4))+'</small></span><span class="ts-tt">'+esc(p.t)+'</span><span class="ts-meta"><span class="dot" style="background:'+BLOGS[p.b].color+'"></span>'+esc(shortName(BLOGS[p.b].name))+(n?' <span class="ts-flag">· backs up '+n+' verified fact'+(n===1?'':'s')+'</span>':'')+'</span></button>'; }).join("")
+      : '<p class="hint">No posts match. Clear the search or turn a blog back on.</p>'; }
+  function nb(d){ if(!cur) return null; for(var j=cur.ts+d;j>=0&&j<SP.length;j+=d) if(vis(SP[j])) return SP[j]; return null; }
+  function go(d){ var p=nb(d); if(!p) return; if(!qw.length && p.d.slice(0,7)!==month) setMonth(p.d.slice(0,7),true); select(p); var el=document.querySelector('.ts-item[data-i="'+p.ts+'"]'); if(el) el.scrollIntoView({block:"nearest"}); }
+  function select(p){ cur=p;
+    Array.prototype.forEach.call(document.querySelectorAll(".ts-item"),function(el){ el.setAttribute("aria-current", p&&+el.dataset.i===p.ts?"true":"false"); });
+    if(!p){ $("ts-story").innerHTML='<div class="ts-card"><p class="ts-sum">Pick a month or search to open a story.</p></div>'; return; }
+    var fi=nearest(p), f=F[fi], cf=citedFor(p);
+    var h='<article class="ts-card"><div class="ts-pmeta"><span class="blog-tag"><span class="dot" style="background:'+BLOGS[p.b].color+'"></span>'+esc(BLOGS[p.b].name)+'</span><span>'+fmtD(p.d)+'</span></div>'
+      +'<h3 class="ts-title">'+esc(p.t)+'</h3>'+(p.s?'<p class="ts-sum">'+esc(p.s)+'</p>':'')
+      +'<a class="ts-read" href="'+esc(p.u)+'" target="_blank" rel="noopener">Read the post <span aria-hidden="true">→</span></a><span class="ts-url">'+esc(p.u)+'</span>'
+      +'<div class="ts-nav"><button type="button" class="btn" id="ts-prev"'+(nb(-1)?'':' disabled')+'>← Earlier</button><button type="button" class="btn" id="ts-next"'+(nb(1)?'':' disabled')+'>Later →</button></div></article>';
+    if(f){ var g=Math.round((f.t-day(p.d))/864e5);
+      h+='<aside class="ts-event" aria-label="Closest verified event"><div class="ts-etop"><h4>Closest verified event</h4><span class="ts-gap">'+esc(gapText(g,f.pr))+'</span></div><div class="ts-when">'+esc(when(f.d))+'</div><p>'+esc(f.s)+(f.v==="corrected"?' <strong>(corrected from a post)</strong>':'')+'</p>'
+        +'<div class="ts-src"><span class="ts-topic">'+esc(f.topic)+'</span>Source: <a href="'+esc(f.src[2])+'" target="_blank" rel="noopener">'+esc(f.src[0])+'</a>'+(f.src[1]?' · '+esc(f.src[1]):'')+'</div></aside>'; }
+    if(cf.length) h+='<section class="ts-card ts-cited"><h4>Verified facts this post states</h4><ul>'+cf.map(function(k){ var x=F[k]; return '<li><strong>'+esc(when(x.d))+'</strong> · '+esc(x.s)+' <a href="'+esc(x.src[2])+'" target="_blank" rel="noopener">Source</a></li>'; }).join("")+'</ul></section>';
+    $("ts-story").innerHTML=h; $("ts-prev").onclick=function(){go(-1);}; $("ts-next").onclick=function(){go(1);}; }
+  $("ts-river").addEventListener("click",function(e){ var b=e.target.closest(".ts-m"); if(!b||b.disabled) return; if(qw.length){ $("ts-q").value=""; qw=[]; } setMonth(b.dataset.k); });
+  $("ts-river").addEventListener("mousemove",function(e){ var b=e.target.closest(".ts-m"); $("ts-hover").textContent=b?b.title:""; });
+  $("ts-list").addEventListener("click",function(e){ var b=e.target.closest(".ts-item"); if(b) select(SP[+b.dataset.i]); });
+  $("ts-chips").addEventListener("click",function(e){ var b=e.target.closest(".ts-chip"); if(!b) return; var i=+b.dataset.b; on[i]=!on[i]; if(!on.some(Boolean)) on=on.map(function(){return true;}); Array.prototype.forEach.call(document.querySelectorAll(".ts-chip"),function(c,j){c.setAttribute("aria-pressed",on[j]?"true":"false");}); if(qw.length) search(); else setMonth(month||last, cur&&vis(cur)); });
+  var tq; $("ts-q").addEventListener("input",function(){ clearTimeout(tq); tq=setTimeout(search,200); });
+  $("ts-q").addEventListener("keydown",function(e){ if(e.key==="Enter"){ clearTimeout(tq); search(); } });
+  $("ts-go").addEventListener("click",function(){ clearTimeout(tq); if($("ts-q").value.trim()){ search(); return; } var pool=SP.filter(vis); if(!pool.length) return; var p=pool[Math.floor(Math.random()*pool.length)]; setMonth(p.d.slice(0,7),true); select(p); var el=document.querySelector('.ts-item[data-i="'+p.ts+'"]'); if(el) el.scrollIntoView({block:"nearest"}); window.scrollTo(0,0); });
+  document.addEventListener("keydown",function(e){ if($("panel-stories").hidden||e.target.closest("input,select,textarea,[role=tab]")) return; if(e.key==="ArrowLeft"){ e.preventDefault(); go(-1);} if(e.key==="ArrowRight"){ e.preventDefault(); go(1);} });
+  TS=true; var start=SP[SP.length-1]; setMonth(start.d.slice(0,7),true); select(start);
+}
+
 /* ---------- Tabs ---------- */
-var TABS=["search","selected","browse","facts","ages","about"];
+var TABS=["search","selected","browse","facts","stories","ages","about"];
 function showTab(name, focus){
   if(TABS.indexOf(name)<0) name="search";
   TABS.forEach(function(t){
@@ -942,7 +1093,8 @@ function showTab(name, focus){
     tab.setAttribute("aria-selected",on); tab.tabIndex=on?0:-1;
     $("panel-"+t).hidden=!on;
   });
-  document.body.classList.toggle("wide", name==="search"||name==="facts");
+  document.body.classList.toggle("wide", name==="search"||name==="facts"||name==="stories");
+  if(name==="stories") initStories();
   if(name==="facts") initFacts();
   if(name==="selected") renderSelected();
   if(focus) $("tab-"+name).focus({preventScroll:true});
