@@ -12,5 +12,6 @@ okf_version: "0.2"
 # Search
 
 * [Open the verified facts explorer](https://kislingjeff-oss.github.io/JAKPublicBlogDatabase/facts/) - One tab per topic, with each fact's source and the posts that state it.
-* [Open the research desk](https://kislingjeff-oss.github.io/JAKPublicBlogDatabase/desk/) - Search every post, select articles and export a linked reading list with summaries.
+* [Open the research desk](https://kislingjeff-oss.github.io/JAKPublicBlogDatabase/desk/) - Search every post, export a linked reading list, check verified facts and explore the ten-year timeline.
+* [Student guide (Word)](desk/Journal-Research-Desk-Student-Guide.docx) - How to use the research desk, step by step with screenshots, written for young people.
 * [Open the catalog](https://kislingjeff-oss.github.io/JAKPublicBlogDatabase/) - Search every post by blog, year, tag or your own words.
