@@ -218,7 +218,9 @@ footer{border-top:1px solid var(--line);padding-block:18px;color:var(--ink-3);fo
 .fx-topic[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
 .fx-topic .n{font-size:.75rem;opacity:.8;font-variant-numeric:tabular-nums}
 .fx-head h3{font:600 1.2rem/1.25 var(--font-read);margin:0 0 4px}
-.fx-head p{margin:0 0 12px;max-width:85ch}
+.fx-head p{margin:0 0 12px;max-width:none}
+#panel-facts .lede{max-width:none}
+.fx-topics.stuck{position:sticky;top:var(--fx-top,52px);z-index:8;background:var(--paper);padding-block:8px;margin-block:-8px 6px;box-shadow:0 1px 0 var(--line)}
 .fx-tools{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin-bottom:12px}
 .fx-tools .input{flex:1 1 260px;min-width:0;width:auto}
 .fx-count{font-size:.9rem;font-variant-numeric:tabular-nums}
@@ -869,10 +871,15 @@ function initFacts(){
   if(FX) return;
   FX=JSON.parse($("facts-data").textContent).topics;
   $("fx-topics").innerHTML=FX.map(function(t,i){return '<button type="button" class="fx-topic" aria-pressed="false" data-i="'+i+'">'+esc(t.short)+' <span class="n">'+t.facts.length+'</span></button>';}).join("");
-  $("fx-topics").addEventListener("click",function(e){var b=e.target.closest(".fx-topic"); if(b) fxShow(+b.dataset.i);});
+  $("fx-topics").addEventListener("click",function(e){var b=e.target.closest(".fx-topic"); if(!b) return; fxStick(); fxShow(+b.dataset.i);});
+  $("fx-q").addEventListener("focus",fxStick); $("fx-fixed").addEventListener("change",fxStick);
   $("fx-q").addEventListener("input",fxRender); $("fx-fixed").addEventListener("change",fxRender); $("fx-copy").addEventListener("click",fxCopy);
   var start=0; try{ var s=localStorage.getItem("desk-facts-topic"); FX.forEach(function(t,i){ if(t.slug===s) start=i; }); }catch(e){}
   fxShow(start);
+}
+function fxStick(){
+  var nav=document.querySelector("nav.tabs"); document.documentElement.style.setProperty("--fx-top",(nav?nav.getBoundingClientRect().height:52)+"px");
+  $("fx-topics").classList.add("stuck");
 }
 function fxShow(i){
   fxCur=i; var t=FX[i];
