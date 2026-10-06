@@ -30,17 +30,19 @@ h1{font:800 clamp(1.5rem,3vw,2rem)/1.1 var(--display);margin:0;letter-spacing:-.
 .stats{display:flex;gap:24px;font-variant-numeric:tabular-nums}
 .stats b{display:block;font:700 1.25rem/1 var(--display)}
 .stats span{font-size:.72rem;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)}
-nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--card);border-bottom:1px solid var(--line)}
+.stick{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);box-shadow:0 1px 0 var(--line)}
+nav{background:var(--card);border-bottom:1px solid var(--line)}
+@media (max-width:700px){.stick{position:static}}
 .tabs{display:flex;flex-wrap:wrap;gap:6px;padding-block:10px}
 .tab{appearance:none;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:6px 12px;font:600 .9rem var(--body);cursor:pointer;display:inline-flex;gap:6px;align-items:center}
 .tab:hover{background:var(--mist)}
 .tab[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--card)}
 .tab .n{font-size:.75rem;opacity:.75;font-variant-numeric:tabular-nums}
 .tab:focus-visible,.btn:focus-visible,input:focus-visible{outline:3px solid var(--accent-2);outline-offset:2px}
-main{padding-block:22px 56px}
-.topic-head{display:grid;gap:6px;margin-bottom:16px}
+main{padding-block:16px 56px}
+.topic-head{display:grid;gap:6px;padding-block:14px 12px}
 h2{font:800 1.4rem/1.2 var(--display);margin:0;text-wrap:balance}
-.summary{margin:0;color:var(--ink-2);max-width:80ch}
+.summary{margin:0;color:var(--ink-2)}
 .tools{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-bottom:12px}
 .search{flex:1 1 280px;min-width:0;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:9px 12px;font:inherit}
 .check{display:inline-flex;gap:8px;align-items:center;font-size:.92rem;cursor:pointer}
@@ -50,7 +52,7 @@ h2{font:800 1.4rem/1.2 var(--display);margin:0;text-wrap:balance}
 .btn:hover{background:var(--mist)}
 .table-box{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--r)}
 table{width:100%;border-collapse:collapse;min-width:820px}
-th{position:sticky;top:0;background:var(--mist);text-align:left;font-size:.72rem;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-2);padding:10px 12px;border-bottom:1px solid var(--line)}
+th{position:sticky;top:var(--th-top,0px);z-index:3;box-shadow:0 1px 0 var(--line);background:var(--mist);text-align:left;font-size:.72rem;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-2);padding:10px 12px;border-bottom:1px solid var(--line)}
 td{padding:12px;border-bottom:1px solid var(--line);vertical-align:top}
 tr:last-child td{border-bottom:0}
 td.date{white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--ink-2);width:7.5rem}
@@ -70,6 +72,7 @@ details.unv p{color:var(--ink-2);font-size:.92rem}
 details.unv li{margin-bottom:8px}
 footer{color:var(--ink-3);font-size:.88rem;padding-block:0 32px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (min-width:701px){.table-box{overflow:visible}table{min-width:0}th:first-child{border-top-left-radius:var(--r)}th:last-child{border-top-right-radius:var(--r)}}
 @media (max-width:700px){table{min-width:0}thead{display:none}tr{display:grid;gap:6px;padding:12px;border-bottom:1px solid var(--line)}td{padding:0;border:0;width:auto!important}td.date{white-space:normal}td.src::before{content:"Source";}td.posts::before{content:"In the posts";}td.src::before,td.posts::before{display:block;font-size:.7rem;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);margin-top:6px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -81,10 +84,12 @@ footer{color:var(--ink-3);font-size:.88rem;padding-block:0 32px}
   <p class="sub">Key historical facts his posts rely on, each checked against an outside source. Choose a topic.</p></div>
   <div class="stats" id="stats"></div>
 </div></header>
-<nav aria-label="Topics"><div class="wrap tabs" role="tablist" id="tabs"></div></nav>
+<div class="stick" id="stick">
+  <nav aria-label="Topics"><div class="wrap tabs" role="tablist" id="tabs"></div></nav>
+  <div class="wrap topic-head"><h2 id="t-title"></h2><p class="summary" id="t-summary"></p></div>
+</div>
 <main class="wrap">
   <section id="panel" role="tabpanel" aria-labelledby="">
-    <div class="topic-head"><h2 id="t-title"></h2><p class="summary" id="t-summary"></p></div>
     <div class="tools">
       <label class="sr" for="q">Search this topic</label>
       <input class="search" id="q" type="search" placeholder="Search facts, sources and post titles in this topic">
@@ -115,9 +120,18 @@ function fmtDate(d){ var m=/^(\d{4})-(\d{2})(?:-(\d{2}))?$/.exec(d); if(!m) retu
 var nf=0,nc=0,nu=0; T.forEach(function(t){nf+=t.facts.length; nu+=t.unv.length; t.facts.forEach(function(f){if(f.v==="corrected")nc++;});});
 $("stats").innerHTML='<div><b>'+nf+'</b><span>Checked facts</span></div><div><b>'+T.length+'</b><span>Topics</span></div><div><b>'+nc+'</b><span>Corrected</span></div>';
 $("tabs").innerHTML=T.map(function(t,i){return '<button class="tab" role="tab" id="tab-'+t.slug+'" aria-controls="panel" aria-selected="false" tabindex="-1" data-i="'+i+'">'+esc(t.short)+' <span class="n">'+t.facts.length+'</span></button>';}).join("");
+function thTop(){
+  var s=$("stick"), h=getComputedStyle(s).position==="sticky"? s.getBoundingClientRect().height : 0;
+  document.documentElement.style.setProperty("--th-top",Math.round(h)+"px");
+}
+function toTableTop(){
+  var box=document.querySelector(".table-box"), top=parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--th-top"))||0;
+  var y=box.getBoundingClientRect().top+window.scrollY-top;
+  if(window.scrollY>y) window.scrollTo(0,Math.max(0,y));
+}
 function show(i,focus){
   cur=i; var t=T[i];
-  Array.prototype.forEach.call(document.querySelectorAll(".tab"),function(b,j){b.setAttribute("aria-selected",j===i?"true":"false"); b.tabIndex=j===i?0:-1; if(j===i&&focus) b.focus();});
+  Array.prototype.forEach.call(document.querySelectorAll(".tab"),function(b,j){b.setAttribute("aria-selected",j===i?"true":"false"); b.tabIndex=j===i?0:-1; if(j===i&&focus) b.focus({preventScroll:true});});
   $("panel").setAttribute("aria-labelledby","tab-"+t.slug);
   $("t-title").textContent=t.title; $("t-summary").textContent=t.summary;
   $("q").value=""; $("only-fixed").checked=false;
@@ -126,7 +140,7 @@ function show(i,focus){
   $("unv").hidden=!t.unv.length; $("unv").open=false;
   $("unv-sum").textContent=t.unv.length+" "+(t.unv.length===1?"statement":"statements")+" not yet verified";
   $("unv-list").innerHTML=t.unv.map(function(u){return '<li>'+esc(u.s)+(u.p.length?' <span class="pub">In the posts:</span> '+u.p.map(function(p){return '<a href="'+esc(p[2])+'" target="_blank" rel="noopener">'+esc(p[0])+'</a>';}).join("; "):'')+'</li>';}).join("");
-  render();
+  render(); thTop(); toTableTop();
 }
 function render(){
   var t=T[cur], q=$("q").value.trim().toLowerCase(), fx=$("only-fixed").checked, words=q.split(/\s+/).filter(Boolean), out=[], n=0;
@@ -159,6 +173,8 @@ $("q").addEventListener("input",render); $("only-fixed").addEventListener("chang
 var start=0, want=(location.hash||"").slice(1); if(!want){ try{ want=localStorage.getItem("facts-tab")||""; }catch(e){} }
 T.forEach(function(t,i){ if(t.slug===want) start=i; });
 show(start);
+window.scrollTo(0,0);
+if(window.ResizeObserver) new ResizeObserver(thTop).observe($("stick")); else window.addEventListener("resize",thTop);
 })();
 </script>
 
