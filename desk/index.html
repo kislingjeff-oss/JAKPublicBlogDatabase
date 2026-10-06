@@ -220,7 +220,8 @@ footer{border-top:1px solid var(--line);padding-block:18px;color:var(--ink-3);fo
 .fx-head h3{font:600 1.2rem/1.25 var(--font-read);margin:0 0 4px}
 .fx-head p{margin:0 0 12px;max-width:none}
 #panel-facts .lede{max-width:none}
-.fx-topics.stuck{position:sticky;top:var(--fx-top,52px);z-index:8;background:var(--paper);padding-block:8px;margin-block:-8px 6px;box-shadow:0 1px 0 var(--line)}
+.fx-sticky.stuck{position:sticky;top:var(--fx-top,52px);z-index:8;background:var(--paper);padding-block:8px 2px;margin-top:-8px;margin-bottom:10px;box-shadow:0 1px 0 var(--line)}
+.fx-sticky.stuck .fx-head p{margin-bottom:8px}
 .fx-tools{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin-bottom:12px}
 .fx-tools .input{flex:1 1 260px;min-width:0;width:auto}
 .fx-count{font-size:.9rem;font-variant-numeric:tabular-nums}
@@ -456,8 +457,10 @@ footer{border-top:1px solid var(--line);padding-block:18px;color:var(--ink-3);fo
   <section class="panel" id="panel-facts" role="tabpanel" aria-labelledby="tab-facts" hidden>
     <h2>Verified Facts</h2>
     <p class="lede">Key historical facts these posts rely on, each checked against an outside source in October 2026. Choose a topic to see its facts, the source that confirms each one, and the posts that state it. Facts are plain summaries, not quotations from the posts.</p>
-    <div class="fx-topics" id="fx-topics" role="group" aria-label="Topics"></div>
-    <div class="fx-head"><h3 id="fx-title"></h3><p id="fx-summary"></p></div>
+    <div class="fx-sticky" id="fx-sticky">
+      <div class="fx-topics" id="fx-topics" role="group" aria-label="Topics"></div>
+      <div class="fx-head"><h3 id="fx-title"></h3><p id="fx-summary"></p></div>
+    </div>
     <div class="fx-tools">
       <label class="sr" for="fx-q">Search this topic</label>
       <input class="input" id="fx-q" type="search" placeholder="Search facts, sources and post titles in this topic">
@@ -879,7 +882,7 @@ function initFacts(){
 }
 function fxStick(){
   var nav=document.querySelector("nav.tabs"); document.documentElement.style.setProperty("--fx-top",(nav?nav.getBoundingClientRect().height:52)+"px");
-  $("fx-topics").classList.add("stuck");
+  $("fx-sticky").classList.add("stuck");
 }
 function fxShow(i){
   fxCur=i; var t=FX[i];
