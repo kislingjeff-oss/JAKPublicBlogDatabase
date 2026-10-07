@@ -479,6 +479,7 @@ footer{border-top:1px solid var(--line);padding-block:18px;color:var(--ink-3);fo
               <label class="check"><input type="checkbox" id="opt-tags"> Tags</label>
               <label class="check"><input type="checkbox" id="opt-also"> Other copies</label>
               <label class="check"><input type="checkbox" id="opt-age"> Age range</label>
+              <label class="check"><input type="checkbox" id="opt-fact"> Related verified fact</label>
               <label class="check"><input type="checkbox" id="opt-num" checked> Numbered list</label>
             </div>
           </div>
@@ -611,7 +612,7 @@ footer{border-top:1px solid var(--line);padding-block:18px;color:var(--ink-3);fo
       </ul>
       <p>To find posts for your group, choose the age of its youngest member under Youth group age on the Search tab.</p>
       <h3>Exporting</h3>
-      <p>When you search or set filters, every article found is selected. Untick any you want to leave out, or use Deselect page. In the Selected &amp; Export tab, choose a format and whether to include a summary of each article, then copy the list or download it. Rich text pastes into email and word processors with working links. Your selection is kept in this browser until you clear it.</p>
+      <p>When you search or set filters, every article found is selected. Untick any you want to leave out, or use Deselect page. In the Selected &amp; Export tab, choose a format and whether to include a summary of each article, then copy the list or download it. Rich text pastes into email and word processors with working links. Tick <strong>Related verified fact</strong> to add, under each article, a fact from the Verified Facts collection: one the post itself states if there is one, otherwise the fact closest to its subject, or, when no fact matches the subject, the verified event closest in time. Each comes with its source link. Your selection is kept in this browser until you clear it.</p>
     </div>
   </section>
 </main>
@@ -1349,18 +1350,55 @@ function renderSelected(){
 
 /* ---------- Export ---------- */
 var FMT="html";
-function opts(){ return { sum:$("opt-summary").checked, meta:$("opt-meta").checked, tags:$("opt-tags").checked, also:$("opt-also").checked, num:$("opt-num").checked, age:$("opt-age").checked, title:$("list-title").value.trim()||"Reading list" }; }
+function opts(){ return { sum:$("opt-summary").checked, meta:$("opt-meta").checked, tags:$("opt-tags").checked, also:$("opt-also").checked, num:$("opt-num").checked, age:$("opt-age").checked, fact:$("opt-fact").checked, title:$("list-title").value.trim()||"Reading list" }; }
 function today(){ var d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
 function mdEsc(s){ return String(s).replace(/([\[\]])/g,"\\$1"); }
 function csvCell(s){ s=String(s==null?"":s); return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; }
+
+/* ---------- Related verified fact for a post (by subject, else by date) ---------- */
+var RF=null;
+function rfInit(){
+  if(RF) return RF;
+  var STOP={}; "the and for with that this from were was are have has had their they them about into over after before also been being more most such than then there these those which while where when what who whom whose will would could should onto upon under between during through against among within without because since until other some many much very only just even both each every first second years year said says including include included".split(" ").forEach(function(w){STOP[w]=1;});
+  function toks(s){ var o={}; (norm(s).match(/[a-z][a-z'’-]{3,}/g)||[]).forEach(function(w){ if(!STOP[w]) o[w]=1; }); return Object.keys(o); }
+  function pdate(d){ var m=/^(\d{4})(?:-(\d{2}))?(?:-(\d{2}))?/.exec(d||""); return m?Date.UTC(+m[1],(m[2]?+m[2]:7)-1,m[3]?+m[3]:1):null; }
+  var F=[], df={}, cited={};
+  JSON.parse($("facts-data").textContent).topics.forEach(function(t){ t.facts.forEach(function(f){ var k=F.length, ts=toks(f.s);
+    ts.forEach(function(w){ df[w]=(df[w]||0)+1; });
+    F.push({d:f.d,s:f.s,topic:t.short,src:f.src[0]||["","",""],ts:ts,t:pdate(f.d)});
+    f.p.forEach(function(p){ (cited[p[2]]=cited[p[2]]||[]).push(k); }); }); });
+  var idf={}; Object.keys(df).forEach(function(w){ idf[w]=Math.log(F.length/df[w]); });
+  RF={F:F,idf:idf,cited:cited,toks:toks,cache:{}}; return RF;
+}
+function relatedFact(p){
+  var R=rfInit(); if(R.cache[p.u]) return R.cache[p.u];
+  var out=null, c=(R.cited[p.u]||[]).concat.apply(R.cited[p.u]||[],(p.a||[]).map(function(u){return R.cited[u]||[];}));
+  if(c.length) out={f:R.F[c[0]],how:"stated"};
+  else {
+    var pt={}; (p.x||"").split(" ").forEach(function(w){ if(w) pt[w]=1; }); var tt={}; R.toks(p.t).forEach(function(w){ tt[w]=1; pt[w]=1; });
+    var d0=Date.UTC(+p.d.slice(0,4),+p.d.slice(5,7)-1,+p.d.slice(8,10)), best=0, bi=-1, near=-1, nd=Infinity;
+    R.F.forEach(function(f,i){
+      if(f.t!=null){ var dd=Math.abs(f.t-d0); if(dd<nd){ nd=dd; near=i; } }
+      if(!f.ts.length) return; var s=0;
+      f.ts.forEach(function(w){ if(pt[w]) s+=R.idf[w]*(tt[w]?2:1); });
+      s/=Math.sqrt(f.ts.length); if(f.t!=null) s*=1+0.25*Math.exp(-Math.abs(f.t-d0)/864e5/730);
+      if(s>best){ best=s; bi=i; } });
+    if(bi>=0 && best>=4) out={f:R.F[bi],how:"subject"}; else if(near>=0) out={f:R.F[near],how:"time"};
+  }
+  R.cache[p.u]=out; return out;
+}
+function rfLabel(r){ return r.how==="stated"?"Verified fact this post states":r.how==="subject"?"Related verified fact":"Verified event closest in time"; }
+function rfMeta(f){ return f.topic+(f.d?", "+rfWhen(f.d):""); }
+function rfWhen(d){ var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d); if(m) return fmtDate(d); m=/^(\d{4})-(\d{2})$/.exec(d); if(m) return ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][+m[2]-1]+" "+m[1]; return (d||"").replace("–"," to "); }
+
 function buildExport(fmt){
   var o=opts(), list=orderedSelection(), n=list.length;
   var note="Exported "+today()+" from "+CONFIG.title+". "+n+" "+(n===1?"article":"articles")+".";
   if(fmt==="csv"){
-    var head=["Title","URL"]; if(o.meta) head.push("Blog","Date"); if(o.age) head.push("Age range","Mature themes"); if(o.tags) head.push("Tags"); if(o.sum) head.push("Summary"); if(o.also) head.push("Other copies");
+    var head=["Title","URL"]; if(o.meta) head.push("Blog","Date"); if(o.age) head.push("Age range","Mature themes"); if(o.tags) head.push("Tags"); if(o.sum) head.push("Summary"); if(o.also) head.push("Other copies"); if(o.fact) head.push("Related fact","Fact date","Fact topic","Fact source","How it was matched");
     var rows=[head.join(",")];
     list.forEach(function(p){
-      var r=['=HYPERLINK("'+p.u.replace(/"/g,'%22')+'","'+String(p.t).slice(0,250).replace(/"/g,'""')+'")',p.u]; if(o.meta) r.push(BLOGS[p.b].name,p.d); if(o.age) r.push(ageLabel(p),(p.th||[]).join("; ")); if(o.tags) r.push((p.g||[]).join("; ")); if(o.sum) r.push(p.s||""); if(o.also) r.push((p.a||[]).join(" "));
+      var r=['=HYPERLINK("'+p.u.replace(/"/g,'%22')+'","'+String(p.t).slice(0,250).replace(/"/g,'""')+'")',p.u]; if(o.meta) r.push(BLOGS[p.b].name,p.d); if(o.age) r.push(ageLabel(p),(p.th||[]).join("; ")); if(o.tags) r.push((p.g||[]).join("; ")); if(o.sum) r.push(p.s||""); if(o.also) r.push((p.a||[]).join(" ")); if(o.fact){ var rf=relatedFact(p); r.push(rf?rf.f.s:"", rf?rf.f.d:"", rf?rf.f.topic:"", rf?rf.f.src[2]:"", rf?rfLabel(rf):""); }
       rows.push(r.map(csvCell).join(","));
     });
     return rows.join("\n");
@@ -1376,6 +1414,7 @@ function buildExport(fmt){
       if(o.sum && p.s) md+=pad+p.s+"\n";
       if(o.tags && p.g && p.g.length) md+=pad+"Tags: "+p.g.join(", ")+"\n";
       if(o.also && p.a && p.a.length) md+=pad+"Also published at: "+p.a.map(function(u){return "<"+u+">";}).join(", ")+"\n";
+      if(o.fact){ var rf=relatedFact(p); if(rf) md+=pad+"**"+rfLabel(rf)+"** ("+rfMeta(rf.f)+"): "+rf.f.s+" Source: ["+mdEsc(rf.f.src[0])+"]("+rf.f.src[2]+")\n"; }
       md+="\n";
     });
     return md.trim()+"\n";
@@ -1390,6 +1429,7 @@ function buildExport(fmt){
       if(o.sum && p.s) t+=p.s+"\n";
       if(o.tags && p.g && p.g.length) t+="Tags: "+p.g.join(", ")+"\n";
       if(o.also && p.a && p.a.length) t+="Also published at: "+p.a.join(" ")+"\n";
+      if(o.fact){ var rf=relatedFact(p); if(rf) t+=rfLabel(rf)+" ("+rfMeta(rf.f)+"): "+rf.f.s+"\nSource: "+rf.f.src[0]+" "+rf.f.src[2]+"\n"; }
       t+="\n";
     });
     return t.trim()+"\n";
@@ -1403,6 +1443,7 @@ function buildExport(fmt){
     if(o.sum && p.s) h+='<p>'+esc(p.s)+'</p>';
     if(o.tags && p.g && p.g.length) h+='<p style="color:#000000;font-size:90%">Tags: '+esc(p.g.join(", "))+'</p>';
     if(o.also && p.a && p.a.length) h+='<p style="color:#000000;font-size:90%">Also published at: '+p.a.map(function(u){return '<a href="'+esc(u)+'">'+esc(u)+'</a>';}).join(", ")+'</p>';
+    if(o.fact){ var rf=relatedFact(p); if(rf) h+='<p style="background:#fff8c9;border-left:4px solid #d9b500;padding:6px 10px;font-size:92%"><strong>'+esc(rfLabel(rf))+'</strong> ('+esc(rfMeta(rf.f))+'): '+esc(rf.f.s)+' Source: <a href="'+esc(rf.f.src[2])+'">'+esc(rf.f.src[0])+'</a></p>'; }
     h+='</li>\n';
   });
   return h+'</'+tag+'>\n';
@@ -1703,7 +1744,7 @@ function bind(){
     clearArmed=false; this.textContent="Clear all"; selected=[]; save(); updateSelCount(); renderSelected(); renderResults();
   });
   $("fmt").addEventListener("click",function(e){ var b=e.target.closest("[data-fmt]"); if(!b) return; FMT=b.getAttribute("data-fmt"); Array.prototype.forEach.call(this.children,function(c){c.setAttribute("aria-pressed",c===b);}); renderExport(); });
-  ["opt-summary","opt-meta","opt-tags","opt-also","opt-num","opt-age","opt-order"].forEach(function(id){ $(id).addEventListener("change",renderExport); });
+  ["opt-summary","opt-meta","opt-tags","opt-also","opt-num","opt-age","opt-fact","opt-order"].forEach(function(id){ $(id).addEventListener("change",renderExport); });
   $("list-title").addEventListener("input",renderExport);
   $("copy").addEventListener("click",copyExport);
   $("download").addEventListener("click",downloadExport);
