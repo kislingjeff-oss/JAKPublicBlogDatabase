@@ -1,5 +1,8 @@
 # Update Log
 
+## 2026-10-10
+* **Update**: Added [Dynamic Queries](https://channelsintoknowledge.com/2026/10/09/dynamic-queries/) (2026-10-09) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
+
 ## 2026-10-07
 * **Update**: Added [Research Desk](https://channelsintoknowledge.com/2026/10/05/research-desk/) (2026-10-05) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
 
