@@ -1,5 +1,8 @@
 # Update Log
 
+## 2026-10-14
+* **Update**: Added [What was happening then?](https://channelsintoknowledge.com/2026/10/12/what-was-happening-then/) (2026-10-12) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
+
 ## 2026-10-13
 * **Update**: Added [What was happening then?](https://channelsintoknowledge.com/2026/10/12/what-was-happening-then/) (2026-10-12) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
 
