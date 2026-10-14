@@ -1,6 +1,7 @@
 # Update Log
 
 ## 2026-10-14
+* **Update**: Added [Journal Research Desk](https://channelsintoknowledge.com/2026/10/13/journal-research-desk/) (2026-10-13) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
 * **Update**: Added [What was happening then?](https://channelsintoknowledge.com/2026/10/12/what-was-happening-then/) (2026-10-12) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
 
 ## 2026-10-13
