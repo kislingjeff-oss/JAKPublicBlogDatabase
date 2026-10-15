@@ -1,5 +1,8 @@
 # Update Log
 
+## 2026-10-15
+* **Update**: Added [Journal Research Desk tutorial](https://channelsintoknowledge.com/2026/10/15/journal-research-desk-tutorial/) (2026-10-15) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
+
 ## 2026-10-14
 * **Update**: Added [Ten Years of Stories](https://channelsintoknowledge.com/2026/10/14/ten-years-of-stories/) (2026-10-14) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
 * **Update**: Added [Journal Research Desk](https://channelsintoknowledge.com/2026/10/13/journal-research-desk/) (2026-10-13) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
