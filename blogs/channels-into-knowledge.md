@@ -1,18 +1,18 @@
 ---
 type: Blog
 title: "Channels Into Knowledge"
-description: "Channels Into Knowledge, 59 posts from 2026-08-07 to 2026-10-15."
+description: "Channels Into Knowledge, 58 posts from 2026-08-07 to 2026-10-14."
 resource: https://channelsintoknowledge.com
 tags: [blog, writings]
 status: stable
 author: "Jeff Kisling"
-generated: { by: process:jak-blog-db-update/1, at: 2026-10-15T00:00:00Z }
+generated: { by: process:jak-blog-db-update/1, at: 2026-10-14T00:00:00Z }
 sources:
   - id: blog
     resource: https://channelsintoknowledge.com
     title: "Channels Into Knowledge"
     author: human:jkisling
-    last_modified: 2026-10-15T00:00:00Z
+    last_modified: 2026-10-14T00:00:00Z
   - id: catalog
     resource: https://kislingjeff-oss.github.io/JAKPublicBlogDatabase/
     title: "Jeff Kisling's Journal (searchable catalog)"
@@ -25,11 +25,11 @@ Blog by Jeff Kisling at <https://channelsintoknowledge.com>.[^blog]
 
 | | |
 |---|---|
-| Posts published | 59 |
-| Shown in the catalog | 59 |
+| Posts published | 58 |
+| Shown in the catalog | 58 |
 | Left out as copies of a newer post on another blog | 0 |
 | First post | 2026-08-07 |
-| Most recent post | 2026-10-15 |
+| Most recent post | 2026-10-14 |
 
 Every post is searchable in the [complete catalog](https://kislingjeff-oss.github.io/JAKPublicBlogDatabase/).[^catalog]
 
@@ -37,7 +37,7 @@ Every post is searchable in the [complete catalog](https://kislingjeff-oss.githu
 
 * channels (29)
 * Quaker (24)
-* writings (19)
+* writings (18)
 * settler colonialism (17)
 * writing (17)
 * Native people (16)
@@ -46,7 +46,7 @@ Every post is searchable in the [complete catalog](https://kislingjeff-oss.githu
 * withheld (11)
 * did not reach (10)
 * life (9)
-* research (8)
+* Great Plains Action Society (7)
 
 [^blog]: Channels Into Knowledge
 [^catalog]: Jeff Kisling's Journal
