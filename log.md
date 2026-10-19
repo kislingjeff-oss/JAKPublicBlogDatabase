@@ -1,5 +1,9 @@
 # Update Log
 
+## 2026-10-19
+* **Update**: Added [Journal Research Desk tutorial](https://channelsintoknowledge.com/2026/10/15/journal-research-desk-tutorial/) (2026-10-15) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
+* **Update**: Added [Walkthrough Using the Journal Research Desk](https://channelsintoknowledge.com/2026/10/17/walkthrough-using-the-journal-research-desk/) (2026-10-17) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
+
 ## 2026-10-18
 * **Update**: Added [Walkthrough Using the Journal Research Desk](https://channelsintoknowledge.com/2026/10/17/walkthrough-using-the-journal-research-desk/) (2026-10-17) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
 
