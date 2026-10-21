@@ -1,6 +1,7 @@
 # Update Log
 
 ## 2026-10-21
+* **Update**: Added [The Research Trail](https://channelsintoknowledge.com/2026/10/20/the-research-trail/) (2026-10-20) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
 * **Update**: Added [Creating storybooks](https://channelsintoknowledge.com/2026/10/19/creating-storybooks/) (2026-10-19) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
 * **Update**: Added [The Research Trail](https://channelsintoknowledge.com/2026/10/20/the-research-trail/) (2026-10-20) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
 
