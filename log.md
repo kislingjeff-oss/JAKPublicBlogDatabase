@@ -1,5 +1,9 @@
 # Update Log
 
+## 2026-10-23
+* **Update**: Added [Quakers and Global Unrest](https://channelsintoknowledge.com/2026/10/21/quakers-and-global-unrest/) (2026-10-21) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
+* **Update**: Added [Rebuilding the Healing Justice House](https://channelsintoknowledge.com/2026/10/22/rebuilding-the-healing-justice-house/) (2026-10-22) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
+
 ## 2026-10-22
 * **Update**: Added [The Research Trail](https://channelsintoknowledge.com/2026/10/20/the-research-trail/) (2026-10-20) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
 * **Update**: Added [Quakers and Global Unrest](https://channelsintoknowledge.com/2026/10/21/quakers-and-global-unrest/) (2026-10-21) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
