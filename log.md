@@ -2,6 +2,7 @@
 
 ## 2026-10-28
 * **Update**: Added [An Epistle to Friends Regarding Community, Mutual Aid and LANDBACK](https://channelsintoknowledge.com/2026/10/27/an-epistle-to-friends-regarding-community-mutual-aid-and-landback/) (2026-10-27) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
+* **Update**: Added [An Epistle to Friends Regarding Community, Mutual Aid and LANDBACK](https://channelsintoknowledge.com/2026/10/27/an-epistle-to-friends-regarding-community-mutual-aid-and-landback/) (2026-10-27) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
 
 ## 2026-10-23
 * **Update**: Added [Quakers and Global Unrest](https://channelsintoknowledge.com/2026/10/21/quakers-and-global-unrest/) (2026-10-21) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
