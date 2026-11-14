@@ -1,5 +1,8 @@
 # Update Log
 
+## 2026-11-14
+* **Update**: Added [Friendly Channels](https://channelsintoknowledge.com/2026/11/12/friendly-channels/) (2026-11-12) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
+
 ## 2026-11-13
 * **Update**: Added [Gangster Capitalism](https://channelsintoknowledge.com/2026/11/09/gangster-capitalism/) (2026-11-09) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
 * **Update**: Added [Friendly Channels](https://channelsintoknowledge.com/2026/11/12/friendly-channels/) (2026-11-12) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
