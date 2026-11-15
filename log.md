@@ -1,5 +1,9 @@
 # Update Log
 
+## 2026-11-15
+* **Update**: Added [What is your spark?](https://channelsintoknowledge.com/2026/11/14/what-is-your-spark/) (2026-11-14) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
+* **Update**: Added [Help others find their spark](https://channelsintoknowledge.com/2026/11/14/help-others-find-their-spark/) (2026-11-14) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
+
 ## 2026-11-14
 * **Update**: Added [Friendly Channels](https://channelsintoknowledge.com/2026/11/12/friendly-channels/) (2026-11-12) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
 
