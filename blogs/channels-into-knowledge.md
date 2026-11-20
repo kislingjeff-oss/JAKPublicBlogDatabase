@@ -1,18 +1,18 @@
 ---
 type: Blog
 title: "Channels Into Knowledge"
-description: "Channels Into Knowledge, 71 posts from 2026-08-07 to 2026-11-18."
+description: "Channels Into Knowledge, 69 posts from 2026-08-07 to 2026-11-14."
 resource: https://channelsintoknowledge.com
 tags: [blog, writings]
 status: stable
 author: "Jeff Kisling"
-generated: { by: process:jak-blog-db-update/1, at: 2026-11-18T00:00:00Z }
+generated: { by: process:jak-blog-db-update/1, at: 2026-11-14T00:00:00Z }
 sources:
   - id: blog
     resource: https://channelsintoknowledge.com
     title: "Channels Into Knowledge"
     author: human:jkisling
-    last_modified: 2026-11-18T00:00:00Z
+    last_modified: 2026-11-14T00:00:00Z
   - id: catalog
     resource: https://kislingjeff-oss.github.io/JAKPublicBlogDatabase/
     title: "Jeff Kisling's Journal (searchable catalog)"
@@ -25,24 +25,24 @@ Blog by Jeff Kisling at <https://channelsintoknowledge.com>.[^blog]
 
 | | |
 |---|---|
-| Posts published | 71 |
-| Shown in the catalog | 71 |
+| Posts published | 69 |
+| Shown in the catalog | 69 |
 | Left out as copies of a newer post on another blog | 0 |
 | First post | 2026-08-07 |
-| Most recent post | 2026-11-18 |
+| Most recent post | 2026-11-14 |
 
 Every post is searchable in the [complete catalog](https://kislingjeff-oss.github.io/JAKPublicBlogDatabase/).[^catalog]
 
 # Most-used tags
 
-* channels (35)
-* Quaker (33)
-* writings (27)
+* channels (33)
+* Quaker (31)
+* writings (25)
 * settler colonialism (22)
-* Native people (20)
+* Native people (19)
 * writing (17)
 * Interactive (15)
-* stories (14)
+* stories (12)
 * history (11)
 * withheld (11)
 * collapse (10)
