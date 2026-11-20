@@ -1,5 +1,8 @@
 # Update Log
 
+## 2026-11-20
+* **Update**: Added [What was the relevance of Quakers to the March?](https://channelsintoknowledge.com/2026/11/18/what-was-the-relevance-of-quakers-to-the-march/) (2026-11-18) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
+
 ## 2026-11-19
 * **Update**: Added [What was the relevance of Quakers to the March?](https://channelsintoknowledge.com/2026/11/18/what-was-the-relevance-of-quakers-to-the-march/) (2026-11-18) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
 
