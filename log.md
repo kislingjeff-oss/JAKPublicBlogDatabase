@@ -1,5 +1,8 @@
 # Update Log
 
+## 2026-11-23
+* **Update**: Added [Quaker spiritual practices shared with frontline movements](https://channelsintoknowledge.com/2026/11/21/quaker-spiritual-practices-shared-with-frontline-movements/) (2026-11-21) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
+
 ## 2026-11-22
 * **Update**: Added [Quaker spiritual practices shared with frontline movements](https://channelsintoknowledge.com/2026/11/21/quaker-spiritual-practices-shared-with-frontline-movements/) (2026-11-21) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
 
