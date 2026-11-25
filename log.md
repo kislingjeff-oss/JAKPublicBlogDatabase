@@ -1,5 +1,8 @@
 # Update Log
 
+## 2026-11-25
+* **Update**: Added [Listening for Guidance: An Illustrated Book for Teens](https://channelsintoknowledge.com/2026/11/24/listening-for-guidance-an-illustrated-book-for-teens/) (2026-11-24) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
+
 ## 2026-11-24
 * **Update**: Added [Quaker spiritual practices shared with frontline movements](https://channelsintoknowledge.com/2026/11/21/quaker-spiritual-practices-shared-with-frontline-movements/) (2026-11-21) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
 * **Update**: Added [I’m a teen really scared for my future](https://channelsintoknowledge.com/2026/11/23/im-a-teen-really-scared-for-my-future/) (2026-11-23) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
