@@ -1,6 +1,7 @@
 # Update Log
 
 ## 2026-11-26
+* **Update**: Added [Why silence can go to all places](https://channelsintoknowledge.com/2026/11/25/why-silence-can-go-to-all-places/) (2026-11-25) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
 * **Update**: Added [Listening for Guidance: An Illustrated Book for Teens](https://channelsintoknowledge.com/2026/11/24/listening-for-guidance-an-illustrated-book-for-teens/) (2026-11-24) from [Channels Into Knowledge](/blogs/channels-into-knowledge.md).
 
 ## 2026-11-25
